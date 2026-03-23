@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPIMUN 2026 — Portal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--navy:#0b1d3a;--gold:#c9a227;--cream:#f5f0e8;--white:#ffffff;--light:#e8e2d4;--ink:#1a1a2e;--muted:#7a7060;--red:#e74c3c}
+    body{font-family:'Source Sans 3',sans-serif;background:var(--cream);color:var(--ink);min-height:100vh}
+    nav{position:fixed;top:0;left:0;width:100%;z-index:200;background:rgba(11,29,58,.97);backdrop-filter:blur(6px);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:58px}
+    .nav-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.1rem;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:.6rem}
+    .nav-logo img{height:36px;width:36px;object-fit:contain}
+    .nav-right{display:flex;align-items:center;gap:1rem}
+    .nav-user{color:rgba(255,255,255,.7);font-size:.85rem}
+    .nav-user strong{color:var(--gold)}
+    .logout-btn{background:transparent;border:1px solid rgba(201,162,39,.4);color:var(--gold);padding:.4rem 1rem;font-size:.8rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;border-radius:3px;cursor:pointer;transition:all .2s;font-family:inherit}
+    .logout-btn:hover{background:var(--gold);color:var(--navy)}
+    .back-btn{color:rgba(255,255,255,.5);text-decoration:none;font-size:.82rem;letter-spacing:.06em;text-transform:uppercase;transition:color .2s}
+    .back-btn:hover{color:var(--gold)}
+    .portal-wrap{padding:90px 2rem 4rem;max-width:1100px;margin:0 auto}
+    .portal-header{margin-bottom:2.5rem}
+    .portal-header .label{font-size:.72rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.4rem}
+    .portal-header h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,4vw,2.6rem);font-weight:900;color:var(--navy)}
+    .portal-tabs{display:flex;gap:.5rem;margin-bottom:2rem;flex-wrap:wrap}
+    .ptab{background:rgba(11,29,58,.06);border:1px solid var(--light);color:var(--muted);font-family:inherit;font-size:.82rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:.55rem 1.2rem;border-radius:3px;cursor:pointer;transition:all .2s}
+    .ptab.active,.ptab:hover{background:var(--navy);color:var(--gold);border-color:var(--navy)}
+    .ptab-panel{display:none}
+    .ptab-panel.active{display:block}
+    .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:1.5rem;margin-bottom:2rem}
+    .card{background:var(--white);border-radius:6px;padding:1.6rem;border-top:3px solid var(--gold);box-shadow:0 2px 12px rgba(0,0,0,.06)}
+    .card-label{font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.5rem}
+    .card-value{font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;color:var(--navy);margin-bottom:.3rem}
+    .card-sub{font-size:.85rem;color:var(--muted)}
+    .card.full{grid-column:1/-1}
+    .card.navy{background:var(--navy)}
+    .card.navy .card-label{color:rgba(255,255,255,.5)}
+    .card.navy .card-value{color:var(--gold)}
+    .card.navy .card-sub{color:rgba(255,255,255,.5)}
+    .notes-box{background:rgba(201,162,39,.08);border:1px solid rgba(201,162,39,.25);border-radius:4px;padding:1.2rem 1.4rem;font-size:.95rem;line-height:1.8;color:#3a3528;white-space:pre-wrap}
+    .admin-section{background:var(--white);border-radius:6px;padding:1.6rem;border-top:3px solid var(--gold);box-shadow:0 2px 12px rgba(0,0,0,.06);margin-bottom:1.5rem}
+    .admin-section h2{font-family:'Playfair Display',serif;font-size:1.3rem;color:var(--navy);margin-bottom:1.2rem}
+    .pw-form,.ann-form{display:flex;flex-direction:column;gap:.8rem;max-width:500px}
+    .pw-form input,.ann-form textarea{background:var(--cream);border:1px solid var(--light);color:var(--ink);font-family:inherit;font-size:.9rem;padding:.75rem 1rem;border-radius:3px;outline:none;transition:border-color .2s}
+    .pw-form input:focus,.ann-form textarea:focus{border-color:var(--gold)}
+    .ann-form textarea{resize:vertical;min-height:80px}
+    .ann-toggle{display:flex;align-items:center;gap:.6rem;font-size:.9rem;cursor:pointer}
+    .ann-toggle input{width:16px;height:16px;cursor:pointer;accent-color:var(--gold)}
+    .pw-btn{background:var(--gold);color:var(--navy);border:none;font-family:inherit;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.75rem 1.5rem;border-radius:3px;cursor:pointer;transition:background .2s;align-self:flex-start}
+    .pw-btn:hover{background:#e0b530}
+    .pw-msg{font-size:.82rem;padding:.4rem .7rem;border-radius:3px;display:none}
+    .pw-msg.ok{background:#d5f5e3;color:#1a7a40;display:block}
+    .pw-msg.err{background:#fde8e8;color:#c0392b;display:block}
+    .delegates-table{width:100%;border-collapse:collapse;font-size:.85rem}
+    .delegates-table th{text-align:left;padding:.6rem .8rem;font-size:.7rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-bottom:2px solid var(--light)}
+    .delegates-table td{padding:.7rem .8rem;border-bottom:1px solid var(--light);vertical-align:top}
+    .delegates-table tr:last-child td{border-bottom:none}
+    .delegates-table tr:hover td{background:rgba(201,162,39,.04)}
+    .badge{display:inline-block;padding:.2rem .6rem;border-radius:2px;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+    .badge.admin{background:var(--gold);color:var(--navy)}
+    .badge.delegate{background:var(--light);color:var(--muted)}
+    .edit-btn{background:var(--navy);color:var(--gold);border:1px solid var(--gold);padding:.3rem .7rem;font-size:.72rem;font-weight:700;border-radius:2px;cursor:pointer;transition:all .2s;margin-right:.3rem}
+    .edit-btn:hover{background:var(--gold);color:var(--navy)}
+    .del-btn{background:transparent;color:var(--red);border:1px solid var(--red);padding:.3rem .7rem;font-size:.72rem;font-weight:700;border-radius:2px;cursor:pointer;transition:all .2s}
+    .del-btn:hover{background:var(--red);color:var(--white)}
+    /* ARTICLES */
+    .new-article-btn{background:var(--gold);color:var(--navy);border:none;font-family:inherit;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.65rem 1.4rem;border-radius:3px;cursor:pointer;transition:background .2s;margin-bottom:1.5rem;display:inline-flex;align-items:center;gap:.5rem}
+    .new-article-btn:hover{background:#e0b530}
+    .articles-admin-list{display:flex;flex-direction:column;gap:1rem}
+    .article-row{background:var(--cream);border:1px solid var(--light);border-radius:4px;padding:1rem 1.2rem;display:flex;align-items:center;gap:1.2rem;flex-wrap:wrap}
+    .article-row-thumb{width:60px;height:60px;border-radius:4px;background:linear-gradient(135deg,#0b1d3a,#1a3a6b);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem;overflow:hidden}
+    .article-row-thumb img{width:100%;height:100%;object-fit:cover}
+    .article-row-info{flex:1;min-width:180px}
+    .article-row-title{font-family:'Playfair Display',serif;font-weight:700;color:var(--navy);font-size:.98rem;margin-bottom:.2rem}
+    .article-row-meta{font-size:.75rem;color:var(--muted)}
+    .article-row-actions{display:flex;gap:.5rem;flex-shrink:0}
+    .draft-badge{display:inline-block;background:#fff3cd;color:#856404;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:2px;margin-left:.5rem}
+    .pdf-badge{display:inline-block;background:#e8f4fd;color:#0277bd;font-size:.65rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;padding:.15rem .5rem;border-radius:2px;margin-left:.3rem}
+    /* EDITOR */
+    .editor-box{display:none;margin-bottom:2rem;padding:1.6rem;background:var(--cream);border-radius:6px;border:1px solid var(--light)}
+    .editor-box h3{font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:1.4rem}
+    .editor-form{display:flex;flex-direction:column;gap:1rem;max-width:780px}
+    .editor-label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:-.6rem}
+    .editor-label span{font-weight:400;text-transform:none;letter-spacing:0;font-size:.72rem}
+    .editor-hint{font-size:.74rem;color:var(--muted);margin-top:-.7rem}
+    .editor-form input[type=text],.editor-form textarea{background:var(--white);border:1px solid var(--light);color:var(--ink);font-family:inherit;font-size:.9rem;padding:.8rem 1rem;border-radius:3px;outline:none;transition:border-color .2s;width:100%}
+    .editor-form input[type=text]:focus,.editor-form textarea:focus{border-color:var(--gold)}
+    .body-ed{min-height:200px;resize:vertical;line-height:1.75}
+    /* PDF UPLOAD ZONE */
+    .upload-zone{border:2px dashed var(--light);border-radius:6px;padding:1.8rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--white);position:relative}
+    .upload-zone:hover{border-color:var(--gold);background:rgba(201,162,39,.03)}
+    .upload-zone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .upload-zone-icon{font-size:2rem;margin-bottom:.5rem}
+    .upload-zone-label{font-size:.9rem;font-weight:600;color:var(--navy);margin-bottom:.2rem}
+    .upload-zone-sub{font-size:.78rem;color:var(--muted)}
+    .upload-progress{display:none;margin-top:.8rem}
+    .upload-bar-wrap{background:var(--light);border-radius:99px;height:5px;overflow:hidden}
+    .upload-bar{background:var(--gold);height:100%;width:0%;transition:width .3s;border-radius:99px}
+    .upload-status{font-size:.78rem;color:var(--muted);margin-top:.4rem;text-align:center}
+    .upload-success{display:none;background:#d5f5e3;color:#1a7a40;border-radius:4px;padding:.7rem 1rem;font-size:.85rem;font-weight:600;align-items:center;gap:.5rem}
+    .upload-success.show{display:flex}
+    .upload-success a{color:#1a7a40;font-size:.78rem;margin-left:auto;text-decoration:none}
+    /* COVER IMAGE */
+    .img-upload-row{border:1px solid var(--light);border-radius:4px;padding:.9rem 1rem;display:flex;align-items:center;gap:.9rem;cursor:pointer;background:var(--white);position:relative;transition:border-color .2s}
+    .img-upload-row:hover{border-color:var(--gold)}
+    .img-upload-row input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+    .img-thumb{width:52px;height:52px;border-radius:4px;object-fit:cover;flex-shrink:0;display:none;border:1px solid var(--light)}
+    .img-upload-placeholder{width:52px;height:52px;border-radius:4px;background:var(--cream);border:1px solid var(--light);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+    .img-upload-text{font-size:.88rem;color:var(--muted)}
+    .img-upload-text strong{color:var(--navy);display:block;font-size:.88rem;margin-bottom:.1rem}
+    /* PUBLISH TOGGLE */
+    .pub-toggle{display:flex;align-items:center;gap:.6rem;font-size:.9rem;cursor:pointer;padding:.3rem 0}
+    .pub-toggle input{width:16px;height:16px;accent-color:var(--gold);cursor:pointer}
+    .editor-actions{display:flex;gap:.8rem;flex-wrap:wrap;align-items:center}
+    .btn-gold{background:var(--gold);color:var(--navy);border:none;font-family:inherit;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.75rem 1.6rem;border-radius:3px;cursor:pointer;transition:background .2s}
+    .btn-gold:hover{background:#e0b530}
+    .btn-gold:disabled{opacity:.6;cursor:not-allowed}
+    .btn-outline{background:transparent;color:var(--navy);border:1px solid var(--light);font-family:inherit;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.75rem 1.4rem;border-radius:3px;cursor:pointer;transition:all .2s}
+    .btn-outline:hover{border-color:var(--navy)}
+    .editor-msg{font-size:.85rem;padding:.5rem .9rem;border-radius:3px;display:none}
+    .editor-msg.ok{background:#d5f5e3;color:#1a7a40;display:block}
+    .editor-msg.err{background:#fde8e8;color:#c0392b;display:block}
+    /* MODAL */
+    .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);backdrop-filter:blur(4px);z-index:999;align-items:center;justify-content:center}
+    .modal.open{display:flex}
+    .modal-box{background:var(--white);border-radius:6px;padding:2rem;width:460px;max-width:95vw;position:relative;max-height:90vh;overflow-y:auto}
+    .modal-box h3{font-family:'Playfair Display',serif;color:var(--navy);margin-bottom:1.2rem}
+    .modal-close{position:absolute;top:12px;right:14px;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--muted)}
+    .modal-form{display:flex;flex-direction:column;gap:.8rem}
+    .modal-form input,.modal-form select,.modal-form textarea{background:var(--cream);border:1px solid var(--light);color:var(--ink);font-family:inherit;font-size:.9rem;padding:.7rem .9rem;border-radius:3px;outline:none;transition:border-color .2s}
+    .modal-form label{font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:-.4rem}
+    .modal-save{background:var(--gold);color:var(--navy);border:none;font-family:inherit;font-size:.85rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;padding:.75rem 1.5rem;border-radius:3px;cursor:pointer}
+    .modal-msg{font-size:.82rem;padding:.4rem .7rem;border-radius:3px;display:none}
+    .modal-msg.ok{background:#d5f5e3;color:#1a7a40;display:block}
+    .modal-msg.err{background:#fde8e8;color:#c0392b;display:block}
+    #loading{position:fixed;inset:0;background:var(--navy);display:flex;align-items:center;justify-content:center;z-index:9999;flex-direction:column;gap:1rem}
+    #loading p{color:rgba(255,255,255,.6);font-size:.9rem;letter-spacing:.1em;text-transform:uppercase}
+    .spinner{width:40px;height:40px;border:3px solid rgba(201,162,39,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite}
+    @keyframes spin{to{transform:rotate(360deg)}}
+    @media(max-width:600px){.cards{grid-template-columns:1fr}.delegates-table{font-size:.78rem}}
+    css.gallery-admin-item{position:relative;aspect-ratio:1/1;border-radius:4px;overflow:hidden;background:var(--navy)}
+.gallery-admin-item img{width:100%;height:100%;object-fit:cover;display:block}
+.gallery-admin-del{position:absolute;top:5px;right:5px;background:rgba(231,76,60,.9);color:#fff;border:none;width:26px;height:26px;border-radius:50%;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .2s}
+.gallery-admin-del:hover{background:var(--red)}
+  </style>
+</head>
+<body>
+
+<div id="loading"><div class="spinner"></div><p>Loading portal…</p></div>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="photos/newlogo.png" alt="SPIMUN" onerror="this.style.display='none'">
+    SPIMUN '26
+  </a>
+  <div class="nav-right">
+    <span class="nav-user">Signed in as <strong id="navName">…</strong></span>
+    <a class="back-btn" href="index.html">← Main Site</a>
+    <button class="logout-btn" onclick="logout()">Log Out</button>
+  </div>
+</nav>
+
+<div class="portal-wrap" id="portalContent" style="display:none">
+
+  <!-- DELEGATE VIEW -->
+  <div id="delegateView">
+    <div class="portal-header"><div class="label">Delegate Portal</div><h1 id="welcomeName">Welcome!</h1></div>
+    <div class="cards">
+      <div class="card navy"><div class="card-label">Your Committee</div><div class="card-value" id="dCommittee">Not yet assigned</div><div class="card-sub">Check back closer to the conference</div></div>
+      <div class="card navy"><div class="card-label">Your Country</div><div class="card-value" id="dCountry">Not yet assigned</div><div class="card-sub">Country assignment by the Secretariat</div></div>
+      <div class="card"><div class="card-label">School</div><div class="card-value" id="dSchool">—</div><div class="card-sub">Registered delegation</div></div>
+      <div class="card"><div class="card-label">Conference</div><div class="card-value">March 20–21</div><div class="card-sub">St. Peter's, Palmela</div></div>
+      <div class="card full"><div class="card-label">Notes from Secretariat</div><div style="margin-top:.6rem" id="dNotes"><span style="color:var(--muted);font-style:italic">No notes yet.</span></div></div>
+    </div>
+    <div class="card" style="max-width:460px">
+      <div class="card-label" style="margin-bottom:.9rem">Change Password</div>
+      <div class="pw-form">
+        <input type="password" id="pwOld" placeholder="Current password">
+        <input type="password" id="pwNew" placeholder="New password (min. 6 characters)">
+        <input type="password" id="pwConfirm" placeholder="Confirm new password">
+        <div class="pw-msg" id="pwMsg"></div>
+        <button class="pw-btn" onclick="changePw('pw')">Update Password</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ADMIN VIEW -->
+  <div id="adminView" style="display:none">
+    <div class="portal-header"><div class="label">Secretariat Admin</div><h1>Conference Management</h1></div>
+    <div class="portal-tabs">
+      <button class="ptab active" onclick="switchTab('tDelegates',this)">👥 Delegates</button>
+      <button class="ptab" onclick="switchTab('tArticles',this)">📰 Articles</button>
+      <button class="ptab" onclick="switchTab('tGallery',this)">🖼 Gallery</button>
+      <button class="ptab" onclick="switchTab('tAnn',this)">📢 Announcement</button>
+      <button class="ptab" onclick="switchTab('tPw',this)">🔑 Password</button>
+    </div>
+
+    <!-- DELEGATES -->
+    <div class="ptab-panel active" id="tDelegates">
+      <div class="admin-section">
+        <h2>All Delegates (<span id="delegateCount">0</span>)</h2>
+        <div style="overflow-x:auto">
+          <table class="delegates-table">
+            <thead><tr><th>Name</th><th>Email</th><th>School</th><th>Committee</th><th>Country</th><th>Role</th><th>Actions</th></tr></thead>
+            <tbody id="delegatesTbody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ARTICLES -->
+    <div class="ptab-panel" id="tArticles">
+      <div class="admin-section">
+        <h2>📰 Articles &amp; News</h2>
+
+        <!-- EDITOR -->
+        <div class="editor-box" id="articleEditor">
+          <h3 id="editorHeading">New Article</h3>
+          <div class="editor-form">
+            <input type="hidden" id="editingId">
+            <input type="hidden" id="savedPdfUrl">
+            <input type="hidden" id="savedPages">
+            <input type="hidden" id="savedImageUrl">
+
+            <span class="editor-label">Title *</span>
+            <input type="text" id="aTitle" placeholder="Article headline">
+
+            <span class="editor-label">Short Summary <span>(optional — shown in article list)</span></span>
+            <input type="text" id="aSummary" placeholder="One line description">
+
+            <span class="editor-label">Canva PDF <span>(optional)</span></span>
+            <span class="editor-hint">Export your Canva design as PDF and upload here. Pages will display as images.</span>
+            <div class="upload-zone" id="pdfZone">
+              <input type="file" id="pdfFile" accept=".pdf" onchange="uploadPdf()">
+              <div class="upload-zone-icon">📄</div>
+              <div class="upload-zone-label">Click to upload PDF</div>
+              <div class="upload-zone-sub">or drag and drop · Max 50MB</div>
+            </div>
+            <div class="upload-progress" id="pdfProgress">
+              <div class="upload-bar-wrap"><div class="upload-bar" id="pdfBar"></div></div>
+              <div class="upload-status" id="pdfStatus">Uploading…</div>
+            </div>
+            <div class="upload-success" id="pdfSuccess">
+              ✅ PDF uploaded &amp; converted to images
+              <a href="#" id="pdfPreviewLink" target="_blank">Preview →</a>
+            </div>
+
+            <span class="editor-label">Cover Image <span>(optional — thumbnail in article list)</span></span>
+            <div class="img-upload-row" id="imgZone">
+              <input type="file" id="imgFile" accept="image/*" onchange="uploadImage()">
+              <div class="img-upload-placeholder" id="imgPlaceholder">🖼</div>
+              <img class="img-thumb" id="imgThumb" alt="Cover">
+              <div class="img-upload-text"><strong>Click to upload cover image</strong>JPG or PNG</div>
+            </div>
+
+            <span class="editor-label">Article Text <span>(optional — shown below PDF images)</span></span>
+            <span class="editor-hint">Use **bold**, *italic*, ## Heading, > blockquote. Blank line = new paragraph.</span>
+            <textarea class="body-ed" id="aBody" placeholder="Write article text here, or leave blank if the PDF is self-contained…"></textarea>
+
+            <label class="pub-toggle"><input type="checkbox" id="aPub" checked> Publish immediately (uncheck to save as draft)</label>
+            <div class="editor-msg" id="editorMsg"></div>
+            <div class="editor-actions">
+              <button class="btn-gold" id="saveBtn" onclick="saveArticle()">Save Article</button>
+              <button class="btn-outline" onclick="cancelEditor()">Cancel</button>
+              <a href="articles.html" target="_blank" style="font-size:.82rem;color:var(--gold);text-decoration:none;margin-left:.4rem">View articles page →</a>
+            </div>
+          </div>
+        </div>
+
+        <button class="new-article-btn" onclick="newArticle()">+ New Article</button>
+        <div id="adminArticleList"><p style="color:var(--muted)">Loading…</p></div>
+      </div>
+    </div>
+<!-- GALLERY -->
+<div class="ptab-panel" id="tGallery">
+  <div class="admin-section">
+    <h2>🖼 Gallery Photos</h2>
+    <p style="color:var(--muted);font-size:.88rem;margin-bottom:1.2rem">Upload new photos or remove existing ones. Changes appear on the main site instantly.</p>
+
+    <div class="upload-zone" id="galleryUploadZone" style="max-width:500px;margin-bottom:1.5rem">
+      <input type="file" id="galleryFile" accept="image/*" multiple onchange="uploadGalleryImages()">
+      <div class="upload-zone-icon">📸</div>
+      <div class="upload-zone-label">Click to upload photos</div>
+      <div class="upload-zone-sub">JPG, PNG, WebP · multiple files allowed</div>
+    </div>
+    <div class="pw-msg" id="galleryMsg"></div>
+
+    <div id="galleryAdminGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px;margin-top:1rem"></div>
+  </div>
+</div>
+    <!-- ANNOUNCEMENT -->
+    <div class="ptab-panel" id="tAnn">
+      <div class="admin-section">
+        <h2>📢 Site Announcement Banner</h2>
+        <p style="color:var(--muted);font-size:.88rem;margin-bottom:1rem">Gold banner shown at the top of the main site. Refreshes every 30 seconds.</p>
+        <div class="ann-form">
+          <textarea id="annText" placeholder="e.g. Lunch is now being served in the cafeteria"></textarea>
+          <label class="ann-toggle"><input type="checkbox" id="annActive"> Show banner on main site</label>
+          <button class="pw-btn" onclick="saveAnn()">Save</button>
+          <div class="pw-msg" id="annMsg"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PASSWORD -->
+    <div class="ptab-panel" id="tPw">
+      <div class="admin-section" style="max-width:460px">
+        <h2>🔑 Change Your Password</h2>
+        <div class="pw-form" style="margin-top:.8rem">
+          <input type="password" id="aPwOld" placeholder="Current password">
+          <input type="password" id="aPwNew" placeholder="New password">
+          <input type="password" id="aPwCfm" placeholder="Confirm new password">
+          <div class="pw-msg" id="aPwMsg"></div>
+          <button class="pw-btn" onclick="changePw('aPw')">Update Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit delegate modal -->
+<div class="modal" id="editModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeEdit()">✕</button>
+    <h3>Edit Delegate</h3>
+    <div class="modal-form">
+      <input type="hidden" id="editEmail">
+      <label>Name</label><input type="text" id="editName">
+      <label>School</label><input type="text" id="editSchool">
+      <label>Committee</label>
+      <select id="editCommittee">
+        <option value="">— Not assigned —</option>
+        <option value="General Assembly">General Assembly</option>
+        <option value="Economic & Social Council">Economic &amp; Social Council</option>
+        <option value="Security Council">Security Council</option>
+      </select>
+      <label>Country</label><input type="text" id="editCountry" placeholder="e.g. France">
+      <label>Role</label>
+      <select id="editRole"><option value="delegate">Delegate</option><option value="admin">Admin (Secretariat)</option></select>
+      <label>Notes (visible to delegate)</label>
+      <textarea id="editNotes" rows="3" style="background:var(--cream);border:1px solid var(--light);color:var(--ink);font-family:inherit;font-size:.9rem;padding:.7rem .9rem;border-radius:3px;outline:none;resize:vertical"></textarea>
+      <div class="modal-msg" id="editMsg"></div>
+      <button class="modal-save" onclick="saveEdit()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const API="/api", tok=()=>localStorage.getItem("spimun_token");
+
+async function api(path,method="GET",body=null){
+  const o={method,headers:{"Content-Type":"application/json","Authorization":"Bearer "+tok()}};
+  if(body) o.body=JSON.stringify(body);
+  return (await fetch(API+path,o)).json();
+}
+async function loadGalleryAdmin(){
+  const grid=document.getElementById("galleryAdminGrid");
+  const photos=await api("/gallery");
+  if(!Array.isArray(photos)||!photos.length){grid.innerHTML='<p style="color:var(--muted);font-style:italic">No photos yet.</p>';return;}
+  grid.innerHTML=photos.map(p=>`
+    <div class="gallery-admin-item" id="gitem-${p.id}">
+      <img src="${p.url}" alt="" onerror="this.parentNode.style.background='#1a3a6b'">
+      <button class="gallery-admin-del" onclick="delGalleryPhoto('${p.id}')" title="Remove">✕</button>
+    </div>`).join("");
+}
+
+async function uploadGalleryImages(){
+  const files=document.getElementById("galleryFile").files;
+  if(!files.length) return;
+  const msg=document.getElementById("galleryMsg");
+  msg.textContent="Uploading "+files.length+" photo(s)…";
+  msg.className="pw-msg ok";
+  let done=0;
+  for(const file of files){
+    const fd=new FormData();
+    fd.append("file",file);
+    try{
+      const r=await fetch("/api/admin/gallery",{method:"POST",headers:{"Authorization":"Bearer "+tok()},body:fd});
+      const d=await r.json();
+      if(d.ok) done++;
+    }catch(e){}
+  }
+  msg.textContent=done+" photo(s) uploaded!";
+  setTimeout(()=>msg.className="pw-msg",3000);
+  loadGalleryAdmin();
+  document.getElementById("galleryFile").value="";
+}
+
+async function delGalleryPhoto(id){
+  if(!confirm("Remove this photo from the gallery?")) return;
+  const r=await api("/admin/gallery/"+id,"DELETE");
+  if(r.ok){document.getElementById("gitem-"+id)?.remove();}
+  else alert(r.error);
+}
+
+async function init(){
+  if(!tok()){window.location.href="index.html";return;}
+  const u=await api("/me");
+  if(u.error){localStorage.removeItem("spimun_token");window.location.href="index.html";return;}
+  document.getElementById("navName").textContent=u.name;
+  document.getElementById("loading").style.display="none";
+  document.getElementById("portalContent").style.display="block";
+  if(u.role==="admin"){
+    document.getElementById("delegateView").style.display="none";
+    document.getElementById("adminView").style.display="block";
+    loadDelegates(); loadAdminArticles(); loadAnn(); loadGalleryAdmin();
+  } else {
+    document.getElementById("welcomeName").textContent="Welcome, "+u.name.split(" ")[0]+"!";
+    document.getElementById("dSchool").textContent=u.school||"—";
+    document.getElementById("dCommittee").textContent=u.committee||"Not yet assigned";
+    document.getElementById("dCountry").textContent=u.country||"Not yet assigned";
+    if(u.notes) document.getElementById("dNotes").innerHTML='<div class="notes-box">'+u.notes+'</div>';
+  }
+}
+
+async function logout(){await api("/logout","POST");localStorage.removeItem("spimun_token");window.location.href="index.html";}
+
+function switchTab(id,btn){
+  document.querySelectorAll(".ptab-panel").forEach(p=>p.classList.remove("active"));
+  document.querySelectorAll(".ptab").forEach(b=>b.classList.remove("active"));
+  document.getElementById(id).classList.add("active"); btn.classList.add("active");
+}
+
+function showMsg(id,text,type){const e=document.getElementById(id);e.textContent=text;e.className="pw-msg "+type;setTimeout(()=>e.className="pw-msg",4000);}
+
+async function changePw(prefix){
+  const isAdmin=prefix==="aPw";
+  const old=document.getElementById(prefix+"Old").value;
+  const nw=document.getElementById(prefix+"New").value;
+  const cf=document.getElementById(isAdmin?"aPwCfm":"pwConfirm").value;
+  const msgId=isAdmin?"aPwMsg":"pwMsg";
+  if(nw!==cf){showMsg(msgId,"Passwords don't match","err");return;}
+  const r=await api("/change-password","POST",{old_password:old,new_password:nw});
+  showMsg(msgId,r.message||r.error,r.ok?"ok":"err");
+  if(r.ok){document.getElementById(prefix+"Old").value="";document.getElementById(prefix+"New").value="";document.getElementById(isAdmin?"aPwCfm":"pwConfirm").value="";}
+}
+
+/* DELEGATES */
+let delegateMap = {};
+
+async function loadDelegates(){
+  const data=await api("/admin/delegates");
+  if(!Array.isArray(data)) return;
+  delegateMap = {};
+  data.forEach(u => delegateMap[u.email] = u);
+  document.getElementById("delegateCount").textContent=data.length;
+  document.getElementById("delegatesTbody").innerHTML=data.map(u=>`
+    <tr>
+      <td><strong>${u.name}</strong></td>
+      <td style="color:var(--muted);font-size:.8rem">${u.email}</td>
+      <td>${u.school||"—"}</td>
+      <td>${u.committee||"<span style='color:var(--muted)'>—</span>"}</td>
+      <td>${u.country||"<span style='color:var(--muted)'>—</span>"}</td>
+      <td><span class="badge ${u.role}">${u.role}</span></td>
+      <td>
+        <button class="edit-btn" onclick="openEditByEmail('${u.email.replace(/'/g,"\\'")}')">Edit</button>
+        <button class="del-btn" onclick="delDel('${u.email.replace(/'/g,"\\'")}','${u.name.replace(/'/g,"\\'")}')">Delete</button>
+      </td>
+    </tr>`).join("");
+}
+
+function openEditByEmail(email){
+  const u = delegateMap[email];
+  if(!u) return;
+  document.getElementById("editEmail").value=u.email;
+  document.getElementById("editName").value=u.name;
+  document.getElementById("editSchool").value=u.school||"";
+  document.getElementById("editCommittee").value=u.committee||"";
+  document.getElementById("editCountry").value=u.country||"";
+  document.getElementById("editRole").value=u.role||"delegate";
+  document.getElementById("editNotes").value=u.notes||"";
+  document.getElementById("editModal").classList.add("open");
+}
+function closeEdit(){document.getElementById("editModal").classList.remove("open");}
+
+async function saveEdit(){
+  const r=await api("/admin/assign","POST",{
+    email:document.getElementById("editEmail").value,
+    committee:document.getElementById("editCommittee").value||null,
+    country:document.getElementById("editCountry").value||null,
+    notes:document.getElementById("editNotes").value,
+    role:document.getElementById("editRole").value
+  });
+  const m=document.getElementById("editMsg");
+  m.textContent=r.ok?"Saved!":r.error;
+  m.className="modal-msg "+(r.ok?"ok":"err");
+  if(r.ok) setTimeout(()=>{closeEdit();loadDelegates();},600);
+}
+
+async function delDel(email,name){
+  if(!confirm(`Delete account for ${name}?`)) return;
+  const r=await api("/admin/delete","POST",{email});
+  if(r.ok) loadDelegates(); else alert(r.error);
+}
+
+/* ANNOUNCEMENT */
+async function loadAnn(){
+  const r=await api("/admin/announcement");
+  document.getElementById("annText").value=r.text||"";
+  document.getElementById("annActive").checked=r.active||false;
+}
+async function saveAnn(){
+  const r=await api("/admin/announcement","POST",{text:document.getElementById("annText").value.trim(),active:document.getElementById("annActive").checked});
+  showMsg("annMsg",r.ok?"Saved!":r.error,r.ok?"ok":"err");
+}
+
+/* ARTICLES */
+let editingId=null;
+
+async function loadAdminArticles(){
+  const list=document.getElementById("adminArticleList");
+  const articles=await api("/admin/articles");
+  if(!Array.isArray(articles)||!articles.length){
+    list.innerHTML='<p style="color:var(--muted);font-style:italic">No articles yet. Click "New Article" to get started.</p>';
+    return;
+  }
+  list.innerHTML=`<div class="articles-admin-list">${articles.map(a=>`
+    <div class="article-row">
+      <div class="article-row-thumb">${a.image?`<img src="${a.image}" alt="" onerror="this.parentNode.innerHTML='📰'">`:"📰"}</div>
+      <div class="article-row-info">
+        <div class="article-row-title">
+          ${a.title}
+          ${!a.published?'<span class="draft-badge">Draft</span>':""}
+          ${a.pdf_url?'<span class="pdf-badge">PDF</span>':""}
+        </div>
+        <div class="article-row-meta">By ${a.author} · ${fmtDate(a.date)}</div>
+      </div>
+      <div class="article-row-actions">
+        <button class="edit-btn" onclick="editArticle('${a.id}')">Edit</button>
+        <button class="edit-btn" style="border-color:var(--muted);color:var(--muted)" onclick="window.open('article.html?id=${a.id}','_blank')">View</button>
+        <button class="del-btn" onclick="delArticle('${a.id}','${a.title.replace(/'/g,"\\'")}')">Delete</button>
+      </div>
+    </div>`).join("")}</div>`;
+}
+
+function fmtDate(d){if(!d)return"";return new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});}
+
+function resetEditor(){
+  document.getElementById("editingId").value="";
+  document.getElementById("aTitle").value="";
+  document.getElementById("aSummary").value="";
+  document.getElementById("aBody").value="";
+  document.getElementById("aPub").checked=true;
+  document.getElementById("savedPdfUrl").value="";
+  document.getElementById("savedPages").value="";
+  document.getElementById("savedImageUrl").value="";
+  document.getElementById("pdfProgress").style.display="none";
+  document.getElementById("pdfSuccess").classList.remove("show");
+  document.getElementById("pdfFile").value="";
+  document.getElementById("imgFile").value="";
+  document.getElementById("imgThumb").style.display="none";
+  document.getElementById("imgPlaceholder").style.display="flex";
+  document.getElementById("editorMsg").className="editor-msg";
+}
+
+function newArticle(){
+  editingId=null;
+  resetEditor();
+  document.getElementById("editorHeading").textContent="New Article";
+  document.getElementById("articleEditor").style.display="block";
+  document.getElementById("articleEditor").scrollIntoView({behavior:"smooth"});
+}
+
+async function editArticle(id){
+  const a=await api("/admin/articles/"+id);
+  if(a.error){alert("Could not load article");return;}
+  editingId=id;
+  resetEditor();
+  document.getElementById("editorHeading").textContent="Edit Article";
+  document.getElementById("editingId").value=id;
+  document.getElementById("aTitle").value=a.title||"";
+  document.getElementById("aSummary").value=a.summary||"";
+  document.getElementById("aBody").value=a.body||"";
+  document.getElementById("aPub").checked=a.published!==false;
+  document.getElementById("savedPdfUrl").value=a.pdf_url||"";
+  document.getElementById("savedPages").value=JSON.stringify(a.pages||[]);
+  document.getElementById("savedImageUrl").value=a.image||"";
+  if(a.pdf_url){
+    document.getElementById("pdfSuccess").classList.add("show");
+    document.getElementById("pdfPreviewLink").href=a.pdf_url;
+  }
+  if(a.image){
+    const t=document.getElementById("imgThumb");
+    t.src=a.image; t.style.display="block";
+    document.getElementById("imgPlaceholder").style.display="none";
+  }
+  document.getElementById("articleEditor").style.display="block";
+  document.getElementById("articleEditor").scrollIntoView({behavior:"smooth"});
+}
+
+function cancelEditor(){
+  document.getElementById("articleEditor").style.display="none";
+  editingId=null;
+}
+
+/* PDF UPLOAD */
+async function uploadPdf(){
+  const file=document.getElementById("pdfFile").files[0];
+  if(!file) return;
+  const prog=document.getElementById("pdfProgress");
+  const bar=document.getElementById("pdfBar");
+  const status=document.getElementById("pdfStatus");
+  const success=document.getElementById("pdfSuccess");
+  prog.style.display="block";
+  success.classList.remove("show");
+  status.textContent="Uploading "+file.name+"…";
+  let pct=0;
+  const iv=setInterval(()=>{pct=Math.min(pct+4,88);bar.style.width=pct+"%";},200);
+  try{
+    const fd=new FormData();
+    fd.append("file",file);
+    const r=await fetch("/api/admin/upload-pdf",{method:"POST",headers:{"Authorization":"Bearer "+tok()},body:fd});
+    clearInterval(iv);
+    const d=await r.json();
+    if(d.ok){
+      bar.style.width="100%";
+      status.textContent="Done!";
+      document.getElementById("savedPdfUrl").value=d.url;
+      document.getElementById("savedPages").value=JSON.stringify(d.pages||[]);
+      if(d.extracted_text && !document.getElementById("aBody").value){
+        document.getElementById("aBody").value=d.extracted_text;
+      }
+      setTimeout(()=>{
+        prog.style.display="none";
+        success.classList.add("show");
+        document.getElementById("pdfPreviewLink").href=d.url;
+      },400);
+    } else {
+      bar.style.width="0%";
+      status.textContent="Error: "+(d.error||"Upload failed");
+    }
+  }catch(e){
+    clearInterval(iv);
+    bar.style.width="0%";
+    status.textContent="Upload failed — check connection";
+  }
+}
+
+/* COVER IMAGE UPLOAD */
+async function uploadImage(){
+  const file=document.getElementById("imgFile").files[0];
+  if(!file) return;
+  const fd=new FormData();
+  fd.append("file",file);
+  try{
+    const r=await fetch("/api/admin/upload-image",{method:"POST",headers:{"Authorization":"Bearer "+tok()},body:fd});
+    const d=await r.json();
+    if(d.ok){
+      document.getElementById("savedImageUrl").value=d.url;
+      const t=document.getElementById("imgThumb");
+      t.src=d.url; t.style.display="block";
+      document.getElementById("imgPlaceholder").style.display="none";
+    }
+  }catch(e){}
+}
+
+async function saveArticle(){
+  const title=document.getElementById("aTitle").value.trim();
+  const summary=document.getElementById("aSummary").value.trim();
+  const body=document.getElementById("aBody").value.trim();
+  const pdfUrl=document.getElementById("savedPdfUrl").value;
+  const pagesRaw=document.getElementById("savedPages").value;
+  const pages=pagesRaw?JSON.parse(pagesRaw):[];
+  const imageUrl=document.getElementById("savedImageUrl").value;
+  const published=document.getElementById("aPub").checked;
+  const msgEl=document.getElementById("editorMsg");
+  const btn=document.getElementById("saveBtn");
+
+  if(!title){msgEl.textContent="Title is required";msgEl.className="editor-msg err";return;}
+  if(!pdfUrl&&!body){msgEl.textContent="Add a PDF or write some text";msgEl.className="editor-msg err";return;}
+
+  btn.disabled=true; btn.textContent="Saving…";
+  const payload={title,summary,body,pdf_url:pdfUrl||null,pages,image_url:imageUrl||null,published};
+  const r=editingId
+    ? await api("/admin/articles/"+editingId,"PUT",payload)
+    : await api("/admin/articles","POST",payload);
+  btn.disabled=false; btn.textContent="Save Article";
+
+  if(r.ok){
+    msgEl.textContent=editingId?"Article updated!":"Article published!";
+    msgEl.className="editor-msg ok";
+    setTimeout(()=>{cancelEditor();loadAdminArticles();},900);
+  } else {
+    msgEl.textContent=r.error||"Something went wrong";
+    msgEl.className="editor-msg err";
+  }
+}
+
+async function delArticle(id,title){
+  if(!confirm(`Delete "${title}"?`)) return;
+  const r=await api("/admin/articles/"+id,"DELETE");
+  if(r.ok) loadAdminArticles(); else alert(r.error);
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPIMUN 2026 — St. Peter's Model United Nations</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --navy:  #0b1d3a;
+      --gold:  #c9a227;
+      --cream: #f5f0e8;
+      --white: #ffffff;
+      --light: #e8e2d4;
+      --ink:   #1a1a2e;
+      --muted: #7a7060;
+    }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Source Sans 3', sans-serif; background: var(--cream); color: var(--ink); overflow-x: hidden; }
+
+    /* ANNOUNCEMENT BANNER */
+    #announcementBar { display: none; position: fixed; top: 0; left: 0; width: 100%; z-index: 300; background: var(--gold); color: var(--navy); padding: .55rem 1rem; text-align: center; font-size: .88rem; font-weight: 700; letter-spacing: .04em; }
+    #announcementBar.visible { display: block; }
+    body.has-announcement nav { top: 36px; }
+    body.has-announcement { padding-top: 36px; }
+
+    /* NAV */
+    nav { position: fixed; top: 0; left: 0; width: 100%; z-index: 200; background: rgba(11,29,58,0.97); backdrop-filter: blur(6px); border-bottom: 2px solid var(--gold); display: flex; align-items: center; justify-content: space-between; padding: 0 2rem; height: 58px; }
+    .nav-logo { font-family: 'Playfair Display', serif; font-weight: 900; font-size: 1.25rem; color: var(--gold); letter-spacing: .04em; text-decoration: none; display: flex; align-items: center; gap: .7rem; }
+    .nav-logo span { color: var(--white); }
+    .nav-logo-img { height: 70px; width: 70px; object-fit: contain; }
+    .nav-logo-fallback { height: 54px; width: 54px; border-radius: 50%; border: 2px solid rgba(201,162,39,.4); background: rgba(201,162,39,.1); display: none; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.3rem; }
+    .nav-links { display: flex; gap: 1.4rem; list-style: none; align-items: center; }
+    .nav-links a { color: var(--light); text-decoration: none; font-size: .85rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; transition: color .2s; }
+    .nav-links a:hover { color: var(--gold); }
+    .login-btn { background: rgba(201,162,39,.15); color: var(--gold); border: 1px solid rgba(201,162,39,.4); width: 36px; height: 36px; border-radius: 50%; cursor: pointer; transition: all .2s; font-family: inherit; display: flex; align-items: center; justify-content: center; padding: 0; }
+    .login-btn:hover { background: var(--gold); color: var(--navy); transform: translateY(-1px); }
+    .login-btn.logged-in { background: var(--gold); color: var(--navy); }
+
+    /* HAMBURGER */
+    .hamburger { display: none; flex-direction: column; gap: 5px; cursor: pointer; background: none; border: none; padding: .4rem; flex-shrink: 0; }
+    .hamburger span { display: block; width: 24px; height: 2px; background: var(--gold); border-radius: 2px; transition: all .3s; }
+    .hamburger.open span:nth-child(1) { transform: rotate(45deg) translate(5px,5px); }
+    .hamburger.open span:nth-child(2) { opacity: 0; }
+    .hamburger.open span:nth-child(3) { transform: rotate(-45deg) translate(5px,-5px); }
+
+    /* HERO */
+    #home { min-height: 100vh; background: var(--navy); display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 80px 2rem 10rem; position: relative; overflow: hidden; }
+    .hero-bg-img { position: absolute; inset: 0; background-image: url('hero.avif'); background-size: cover; background-position: center top; filter: brightness(0.25) saturate(0.5); }
+    .hero-bg-overlay { position: absolute; inset: 0; background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(201,162,39,.13) 0%, transparent 70%), repeating-linear-gradient(0deg, transparent, transparent 59px, rgba(255,255,255,.02) 60px), repeating-linear-gradient(90deg, transparent, transparent 59px, rgba(255,255,255,.02) 60px); }
+    .un-emblem { position: relative; width: 220px; height: 220px; margin-bottom: 1.8rem; opacity: .92; animation: floatY 4s ease-in-out infinite; object-fit: contain; }
+    @keyframes floatY { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .hero-badge { position: relative; display: inline-block; border: 1px solid var(--gold); color: var(--gold); font-size: .75rem; letter-spacing: .2em; text-transform: uppercase; padding: .35rem 1rem; border-radius: 2px; margin-bottom: 1.2rem; font-weight: 600; }
+    .hero-title { position: relative; font-family: 'Playfair Display', serif; font-size: clamp(3.5rem, 12vw, 8rem); font-weight: 900; color: var(--white); line-height: 1; margin-bottom: .5rem; letter-spacing: -.02em; }
+    .hero-title em { color: var(--gold); font-style: italic; }
+    .hero-sub { position: relative; font-size: clamp(1rem, 2vw, 1.25rem); color: var(--light); font-weight: 300; max-width: 580px; margin: 0 auto 2.2rem; line-height: 1.7; }
+    .hero-cta { position: relative; display: inline-block; background: var(--gold); color: var(--navy); font-weight: 700; font-size: .95rem; letter-spacing: .06em; text-transform: uppercase; text-decoration: none; padding: .85rem 2.4rem; border-radius: 3px; transition: background .2s, transform .2s; }
+    .hero-cta:hover { background: #e0b530; transform: translateY(-2px); }
+    .hero-meta { position: absolute; bottom: 2rem; display: flex; gap: 2.5rem; font-size: .82rem; color: rgba(255,255,255,.5); letter-spacing: .12em; text-transform: uppercase; flex-wrap: wrap; justify-content: center; }
+    .hero-meta strong { color: var(--gold); display: block; font-size: 1.1rem; }
+
+    /* SECTIONS */
+    section { padding: 100px 2rem; scroll-margin-top: 58px; }
+    .container { max-width: 1100px; margin: 0 auto; }
+    .section-label { font-size: .75rem; letter-spacing: .25em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .8rem; }
+    .section-title { font-family: 'Playfair Display', serif; font-size: clamp(2rem, 4vw, 3rem); font-weight: 900; color: var(--navy); line-height: 1.1; margin-bottom: 1.4rem; }
+    .divider { width: 56px; height: 3px; background: var(--gold); margin-bottom: 2.4rem; }
+
+    /* ABOUT */
+    #about { background: var(--cream); }
+    .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 5rem; align-items: center; }
+    .about-text p { font-size: 1.05rem; line-height: 1.85; color: #3a3528; margin-bottom: 1.2rem; }
+    .about-stats { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+    .stat-card { background: var(--navy); color: var(--white); padding: 1.8rem 1.5rem; border-radius: 4px; border-bottom: 3px solid var(--gold); }
+    .stat-card .num { font-family: 'Playfair Display', serif; font-size: 2.6rem; font-weight: 900; color: var(--gold); line-height: 1; }
+    .stat-card .lbl { font-size: .82rem; letter-spacing: .1em; text-transform: uppercase; color: rgba(255,255,255,.6); margin-top: .4rem; }
+
+    /* SCHEDULE */
+    #schedule { background: var(--navy); }
+    #schedule .section-title { color: var(--white); }
+    .schedule-tabs { display: flex; gap: .5rem; margin-bottom: 2.5rem; flex-wrap: wrap; }
+    .tab-btn { background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15); color: var(--light); font-family: inherit; font-size: .88rem; font-weight: 600; letter-spacing: .06em; text-transform: uppercase; padding: .55rem 1.4rem; border-radius: 2px; cursor: pointer; transition: all .2s; }
+    .tab-btn.active, .tab-btn:hover { background: var(--gold); color: var(--navy); border-color: var(--gold); }
+    .day-panel { display: none; }
+    .day-panel.active { display: block; }
+    .timeline { position: relative; padding-left: 2.5rem; }
+    .timeline::before { content: ''; position: absolute; left: .6rem; top: 0; bottom: 0; width: 2px; background: rgba(201,162,39,.3); }
+    .tl-item { position: relative; margin-bottom: 2rem; }
+    .tl-dot { position: absolute; left: -2.5rem; top: .35rem; width: 14px; height: 14px; border-radius: 50%; background: var(--gold); border: 3px solid var(--navy); box-shadow: 0 0 0 3px var(--gold); }
+    .tl-time { font-size: .78rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .2rem; }
+    .tl-title { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: var(--white); font-weight: 700; }
+    .tl-desc { font-size: .9rem; color: rgba(255,255,255,.5); margin-top: .25rem; }
+
+    /* COMMITTEES */
+    #committees { background: var(--light); }
+    .committees-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; align-items: start; }
+    .committee-card { background: var(--white); border-radius: 4px; overflow: hidden; border-top: 4px solid var(--gold); padding: 1.8rem; transition: transform .25s, box-shadow .25s; }
+    .committee-card:hover { transform: translateY(-4px); box-shadow: 0 12px 40px rgba(0,0,0,.12); }
+    .committee-card .tag { font-size: .7rem; letter-spacing: .18em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .6rem; }
+    .committee-card h3 { font-family: 'Playfair Display', serif; font-size: 1.2rem; font-weight: 700; color: var(--navy); margin-bottom: .8rem; }
+    .committee-card h4 { font-size: .72rem; letter-spacing: .14em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-top: .9rem; margin-bottom: .3rem; }
+    .committee-card p { font-size: .88rem; color: var(--muted); line-height: 1.65; }
+    .committee-downloads { display: flex; gap: .6rem; margin-top: 1.2rem; flex-wrap: wrap; }
+    .dl-btn { display: inline-flex; align-items: center; gap: .4rem; background: var(--navy); color: var(--gold); border: 1px solid var(--gold); border-radius: 3px; font-family: inherit; font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .45rem .9rem; text-decoration: none; transition: background .2s, color .2s; cursor: pointer; white-space: nowrap; }
+    .dl-btn:hover { background: var(--gold); color: var(--navy); }
+    .dl-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+
+    /* CHAIRS */
+    .chairs-toggle-btn { width: 100%; margin-top: 1.2rem; background: transparent; border: 1px solid rgba(11,29,58,.2); color: var(--navy); font-family: inherit; font-size: .78rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .6rem 1rem; border-radius: 3px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background .2s, border-color .2s, color .2s; }
+    .chairs-toggle-btn:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .chairs-toggle-btn .chairs-arrow { transition: transform .3s; }
+    .chairs-toggle-btn.open { background: var(--navy); color: var(--white); border-color: var(--navy); }
+    .chairs-toggle-btn.open .chairs-arrow { transform: rotate(180deg); }
+    .chairs-panel { display: none; margin-top: .8rem; border-top: 1px solid var(--light); padding-top: .9rem; }
+    .chairs-panel.open { display: block; }
+    .chairs-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: .9rem; margin-top: .4rem; }
+    .chair-card { text-align: center; }
+    .chair-photo { width: 100%; aspect-ratio: 1/1; border-radius: 6px; overflow: hidden; margin-bottom: .45rem; background: linear-gradient(135deg, #0f2545, #1a3a6b); border: 2px solid rgba(201,162,39,.2); display: flex; align-items: center; justify-content: center; font-size: 2rem; transition: border-color .2s; }
+    .chair-card:hover .chair-photo { border-color: rgba(201,162,39,.6); }
+    .chair-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .chair-name { font-family: 'Playfair Display', serif; font-size: .82rem; font-weight: 700; color: var(--navy); line-height: 1.2; }
+
+    /* RULES */
+    #rules { background: var(--cream); }
+    #rules .section-title { color: var(--navy); }
+
+    /* ARTICLES PREVIEW */
+    #articles-preview { background: var(--light); }
+    #articles-preview .section-title { color: var(--navy); }
+    .articles-preview-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+    .ap-card { background: var(--white); border-radius: 6px; overflow: hidden; border-top: 3px solid var(--gold); text-decoration: none; color: inherit; display: flex; flex-direction: column; transition: transform .25s, box-shadow .25s; }
+    .ap-card:hover { transform: translateY(-4px); box-shadow: 0 10px 32px rgba(0,0,0,.1); }
+    .ap-card-img { width: 100%; height: 180px; background: linear-gradient(135deg, #0b1d3a, #1a3a6b); display: flex; align-items: center; justify-content: center; font-size: 2.5rem; flex-shrink: 0; overflow: hidden; }
+    .ap-card-img img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .ap-card-body { padding: 1.4rem; flex: 1; display: flex; flex-direction: column; }
+    .ap-card-meta { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); font-weight: 700; margin-bottom: .5rem; }
+    .ap-card-title { font-family: 'Playfair Display', serif; font-size: 1.05rem; font-weight: 700; color: var(--navy); margin-bottom: .5rem; line-height: 1.3; }
+    .ap-card-summary { font-size: .85rem; color: var(--muted); line-height: 1.7; flex: 1; }
+    .ap-card-read { font-size: .75rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--gold); margin-top: .9rem; }
+    .ap-empty { color: var(--muted); font-style: italic; font-size: .95rem; }
+    .view-all-btn { display: inline-flex; align-items: center; gap: .5rem; background: var(--navy); color: var(--gold); border: 1px solid var(--gold); font-family: inherit; font-size: .85rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .75rem 1.8rem; border-radius: 3px; text-decoration: none; transition: background .2s, color .2s; }
+    .view-all-btn:hover { background: var(--gold); color: var(--navy); }
+
+    /* GALLERY */
+    #gallery { background: var(--navy); }
+    #gallery .section-title { color: var(--white); }
+    #gallery .section-label { color: var(--gold); }
+    .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+    .gallery-item { background: var(--navy); border-radius: 3px; overflow: hidden; cursor: pointer; position: relative; }
+    .gallery-placeholder { width: 100%; aspect-ratio: 1/1; display: flex; align-items: center; justify-content: center; font-size: 2rem; background: linear-gradient(135deg, #0b1d3a 0%, #1a3a6b 100%); transition: transform .3s; }
+    .gallery-item img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; transition: transform .3s; }
+    .gallery-item:hover .gallery-placeholder, .gallery-item:hover img { transform: scale(1.06); }
+    .gallery-item::after { content: '⤢'; position: absolute; top: 7px; right: 9px; color: rgba(255,255,255,.8); font-size: .95rem; opacity: 0; transition: opacity .2s; pointer-events: none; }
+    .gallery-item:hover::after { opacity: 1; }
+    .gallery-hidden { display: none; }
+    .gallery-hidden.visible-card { display: block; }
+    .gallery-toggle-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); font-family: inherit; font-size: .9rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .8rem 2.2rem; border-radius: 3px; cursor: pointer; transition: all .25s; display: block; margin: 2rem auto 0; }
+    .gallery-toggle-btn:hover { background: var(--gold); color: var(--navy); }
+
+    /* LIGHTBOX */
+    .lightbox { display: none; position: fixed; inset: 0; z-index: 999; background: rgba(0,0,0,.93); backdrop-filter: blur(5px); align-items: center; justify-content: center; }
+    .lightbox.open { display: flex; }
+    .lightbox-inner { position: relative; display: flex; align-items: center; justify-content: center; }
+    .lightbox-content { max-width: 88vw; max-height: 84vh; min-width: 320px; min-height: 240px; background: linear-gradient(135deg, #0b1d3a, #162d56); border-radius: 6px; border: 2px solid rgba(201,162,39,.35); display: flex; align-items: center; justify-content: center; font-size: 6rem; overflow: hidden; }
+    .lightbox-content img { max-width: 88vw; max-height: 84vh; object-fit: contain; display: block; border-radius: 4px; }
+    .lightbox-close { position: absolute; top: -44px; right: 0; color: var(--gold); background: none; border: none; font-size: 2.2rem; cursor: pointer; line-height: 1; transition: transform .2s; }
+    .lightbox-close:hover { transform: rotate(90deg); }
+    .lightbox-nav { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(11,29,58,.7); border: 1px solid var(--gold); color: var(--gold); width: 46px; height: 46px; border-radius: 50%; font-size: 1.5rem; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background .2s; z-index: 2; }
+    .lightbox-nav:hover { background: var(--gold); color: var(--navy); }
+    .lightbox-prev { left: -64px; }
+    .lightbox-next { right: -64px; }
+    .lightbox-counter { position: absolute; bottom: -34px; left: 50%; transform: translateX(-50%); color: rgba(255,255,255,.45); font-size: .8rem; letter-spacing: .1em; white-space: nowrap; }
+
+    /* STAFF */
+    #staff { background: var(--cream); }
+    #staff .section-title { color: var(--navy); }
+    .staff-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1.8rem; }
+    .staff-card { text-align: center; transition: transform .25s; }
+    .staff-card:hover { transform: translateY(-5px); }
+    .staff-photo { width: 100%; aspect-ratio: 1/1; border-radius: 8px; overflow: hidden; margin-bottom: .9rem; background: linear-gradient(135deg, #0f2545, #1a3a6b); border: 2px solid rgba(201,162,39,.2); display: flex; align-items: center; justify-content: center; font-size: 3.5rem; transition: border-color .25s; }
+    .staff-card:hover .staff-photo { border-color: rgba(201,162,39,.6); }
+    .staff-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .staff-name { font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--navy); margin-bottom: .3rem; }
+    .staff-role { font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); font-weight: 600; line-height: 1.4; }
+    .staff-toggle-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); font-family: inherit; font-size: .9rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .8rem 2.2rem; border-radius: 3px; cursor: pointer; transition: all .25s; display: block; margin: 2.5rem auto 0; }
+    .staff-toggle-btn:hover { background: var(--gold); color: var(--navy); }
+
+    /* FAQ */
+    #faq { background: var(--navy); }
+    #faq .section-title { color: var(--white); }
+    .faq-list { display: flex; flex-direction: column; gap: 1rem; max-width: 780px; }
+    .faq-item { background: rgba(255,255,255,.05); border: 1px solid rgba(201,162,39,.2); border-radius: 4px; overflow: hidden; }
+    .faq-question { width: 100%; text-align: left; background: none; border: none; cursor: pointer; padding: 1.2rem 1.5rem; display: flex; justify-content: space-between; align-items: center; gap: 1rem; font-family: 'Playfair Display', serif; font-size: 1rem; font-weight: 700; color: var(--white); transition: color .2s; }
+    .faq-question:hover { color: var(--gold); }
+    .faq-question .faq-icon { color: var(--gold); font-size: 1.2rem; flex-shrink: 0; transition: transform .3s; }
+    .faq-question.open .faq-icon { transform: rotate(45deg); }
+    .faq-answer { max-height: 0; overflow: hidden; transition: max-height .4s ease, padding .3s; padding: 0 1.5rem; font-size: .95rem; color: rgba(255,255,255,.65); line-height: 1.8; }
+    .faq-answer.open { max-height: 400px; padding: 0 1.5rem 1.2rem; }
+    .faq-answer a { color: var(--gold); }
+    .faq-hidden { display: none; }
+    .faq-hidden.visible-card { display: block; }
+    .faq-toggle-btn { background: transparent; border: 2px solid var(--gold); color: var(--gold); font-family: inherit; font-size: .9rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: .8rem 2.2rem; border-radius: 3px; cursor: pointer; transition: all .25s; display: block; margin: 2rem auto 0; }
+    .faq-toggle-btn:hover { background: var(--gold); color: var(--navy); }
+
+    /* CONTACT */
+    #contact { background: var(--cream); }
+    .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4rem; align-items: start; }
+    .contact-info p { color: #3a3528; line-height: 1.8; font-size: 1rem; margin-bottom: 2rem; }
+    .contact-detail { display: flex; gap: 1rem; margin-bottom: 1rem; align-items: flex-start; }
+    .contact-detail .icon { font-size: 1.2rem; margin-top: .1rem; }
+    .contact-detail .text { font-size: .9rem; color: var(--ink); }
+    .contact-detail .text strong { display: block; color: var(--gold); font-size: .75rem; letter-spacing: .12em; text-transform: uppercase; margin-bottom: .15rem; }
+    .contact-form { display: flex; flex-direction: column; gap: 1rem; }
+    .contact-form input, .contact-form textarea { background: var(--white); border: 1px solid var(--light); color: var(--ink); font-family: inherit; font-size: .95rem; padding: .85rem 1.1rem; border-radius: 3px; outline: none; transition: border-color .2s; }
+    .contact-form input:focus, .contact-form textarea:focus { border-color: var(--gold); }
+    .contact-form textarea { resize: vertical; min-height: 130px; }
+    .submit-btn { background: var(--gold); color: var(--navy); border: none; font-family: inherit; font-size: .9rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: .9rem; border-radius: 3px; cursor: pointer; transition: background .2s; }
+    .submit-btn:hover { background: #e0b530; }
+    .submit-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .form-success { display: none; text-align: center; padding: 2.5rem 1.5rem; background: var(--white); border-radius: 3px; border: 1px solid var(--light); }
+    .form-success .check { font-size: 3rem; margin-bottom: .6rem; }
+    .form-success p { color: #3a3528; line-height: 1.7; }
+
+    /* FOOTER */
+    footer { background: #060f1e; color: rgba(255,255,255,.4); text-align: center; padding: 2.5rem 1rem; font-size: .82rem; border-top: 1px solid rgba(201,162,39,.2); }
+    footer strong { color: var(--gold); }
+
+    /* REVEAL */
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+    .reveal.visible { opacity: 1; transform: none; }
+
+    /* LOGIN MODAL */
+    .login-modal { position: fixed; inset: 0; background: rgba(0,0,0,.75); backdrop-filter: blur(5px); display: none; align-items: center; justify-content: center; z-index: 9999; }
+    .login-modal.open { display: flex; }
+    .login-box { background: var(--white); padding: 2.5rem; border-radius: 6px; width: 360px; max-width: 95vw; position: relative; }
+    .login-box h3 { font-family: 'Playfair Display', serif; color: var(--navy); font-size: 1.4rem; margin-bottom: .3rem; }
+    .login-box .subtitle { color: var(--muted); font-size: .88rem; margin-bottom: 1.5rem; }
+    .login-close { position: absolute; top: 12px; right: 14px; border: none; background: none; font-size: 1.4rem; cursor: pointer; color: var(--muted); }
+    .login-close:hover { color: var(--ink); }
+    .login-tabs { display: flex; gap: 0; margin-bottom: 1.5rem; border: 1px solid var(--light); border-radius: 4px; overflow: hidden; }
+    .login-tab { flex: 1; padding: .6rem; text-align: center; font-size: .82rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; cursor: pointer; border: none; background: transparent; color: var(--muted); transition: all .2s; font-family: inherit; }
+    .login-tab.active { background: var(--navy); color: var(--gold); }
+    .lf { display: flex; flex-direction: column; gap: .8rem; }
+    .lf input { background: var(--cream); border: 1px solid var(--light); color: var(--ink); font-family: inherit; font-size: .9rem; padding: .75rem 1rem; border-radius: 3px; outline: none; transition: border-color .2s; }
+    .lf input:focus { border-color: var(--gold); }
+    .lf-btn { background: var(--gold); color: var(--navy); border: none; font-family: inherit; font-size: .9rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: .85rem; border-radius: 3px; cursor: pointer; transition: background .2s; }
+    .lf-btn:hover { background: #e0b530; }
+    .lf-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .lf-msg { font-size: .82rem; padding: .5rem .8rem; border-radius: 3px; display: none; text-align: center; }
+    .lf-msg.err { background: #fde8e8; color: #c0392b; display: block; }
+    .lf-msg.ok  { background: #d5f5e3; color: #1a7a40; display: block; }
+
+    /* RESPONSIVE */
+    @media (max-width: 900px) { .gallery-grid { grid-template-columns: repeat(3, 1fr); } .lightbox-prev { left: -50px; } .lightbox-next { right: -50px; } }
+    @media (max-width: 768px) {
+      .hamburger { display: flex; }
+      .nav-links { display: none; flex-direction: column; gap: 0; position: absolute; top: 58px; left: 0; width: 100%; background: rgba(11,29,58,.98); border-bottom: 2px solid var(--gold); padding: .5rem 0; }
+      .nav-links.open { display: flex; }
+      .nav-links li { width: 100%; }
+      .nav-links a { display: block; padding: .85rem 2rem; font-size: .9rem; border-bottom: 1px solid rgba(255,255,255,.05); }
+      .nav-links li:last-child { padding: .8rem 2rem; }
+      .about-grid, .contact-grid { grid-template-columns: 1fr; gap: 2.5rem; }
+      .about-stats { grid-template-columns: 1fr 1fr; }
+      .gallery-grid { grid-template-columns: repeat(2, 1fr); }
+      .lightbox-prev { left: 4px; } .lightbox-next { right: 4px; }
+      .articles-preview-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 480px) { .gallery-grid { grid-template-columns: repeat(2, 1fr); } .staff-grid { grid-template-columns: repeat(2, 1fr); } .chairs-grid { grid-template-columns: repeat(3, 1fr); } }
+  </style>
+</head>
+<body>
+
+<!-- ANNOUNCEMENT BANNER -->
+<div id="announcementBar"></div>
+
+<!-- NAV -->
+<nav>
+  <a class="nav-logo" href="#home">
+    <img class="nav-logo-img" src="photos/newlogo.png" alt="SPIMUN logo"
+         onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+    <span class="nav-logo-fallback">🌐</span>
+    SPIMUN '26
+  </a>
+  <ul class="nav-links" id="navLinks">
+    <li><a href="articles.html" onclick="closeMenu()" style="color:var(--navy);background:var(--gold);padding:.3rem .7rem;border-radius:3px;font-weight:700">Newspaper</a></li>
+    <li><a href="#about" onclick="closeMenu()">About</a></li>
+    <li><a href="#schedule" onclick="closeMenu()">Schedule</a></li>
+    <li><a href="#committees" onclick="closeMenu()">Committees</a></li>
+    <li><a href="#gallery" onclick="closeMenu()">Gallery</a></li>
+    <li><a href="#staff" onclick="closeMenu()">Team</a></li>
+    <li><a href="#faq" onclick="closeMenu()">FAQ</a></li>
+    <li><a href="#rules" onclick="closeMenu()">Rules</a></li>
+    <li><a href="#contact" onclick="closeMenu()">Contact</a></li>
+    <li><button class="login-btn" id="loginNavBtn" onclick="handleLoginBtn()" title="Delegate Login">
+      <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+    </button></li>
+  </ul>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg-img"></div>
+  <div class="hero-bg-overlay"></div>
+  <img class="un-emblem" src="photos/newlogo.png" alt="SPIMUN emblem" onerror="this.style.display='none'">
+  <p class="hero-badge">St. Peter's International School</p>
+  <h1 class="hero-title">SPI<em>MUN</em><br/><span style="font-size:.55em;font-style:italic;color:var(--gold)">2026</span></h1>
+  <p class="hero-sub">Bridging perspectives, forging solutions.<br/>Two days of debate, diplomacy, and discovery.</p>
+  <a href="#about" class="hero-cta">Explore the Conference</a>
+  <div class="hero-meta">
+    <div><strong>March 20–21</strong>Dates</div>
+    <div><strong>3</strong>Committees</div>
+    <div><strong>100+</strong>Delegates</div>
+    <div><strong>6</strong>Schools</div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="container">
+    <div class="about-grid">
+      <div class="about-text reveal">
+        <p class="section-label">About Us</p>
+        <h2 class="section-title">Who We Are</h2>
+        <div class="divider"></div>
+        <p>SPIMUN is a two-day simulation of the United Nations that will take place on the 20th and 21st of March, 2026 at St. Peter's International School, in Palmela, Portugal. At SPIMUN, delegates will debate the most pressing issues in The Human Rights Council and The Economic and Social Council.</p>
+        <p>Striving for innovation and empowerment of young delegates and their knowledge of international relations and diplomacy, we are proud to announce the fourth annual edition of SPIMUN!</p>
+      </div>
+      <div class="about-stats reveal">
+        <div class="stat-card"><div class="num">5</div><div class="lbl">Conferences Done</div></div>
+        <div class="stat-card"><div class="num">100+</div><div class="lbl">Delegates</div></div>
+        <div class="stat-card"><div class="num">3</div><div class="lbl">Committees</div></div>
+        <div class="stat-card"><div class="num">2</div><div class="lbl">Days of Debate</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+<!-- FOLLOW US -->
+<section id="follow" style="background:var(--navy);text-align:center;padding:80px 2rem">
+  <p style="font-size:.75rem;letter-spacing:.25em;text-transform:uppercase;color:var(--gold);font-weight:700;margin-bottom:.8rem">Stay Connected</p>
+  <h2 style="font-family:'Playfair Display',serif;font-size:clamp(2.2rem,6vw,4rem);font-weight:900;color:var(--white);line-height:1.1;margin-bottom:.5rem">Follow <em style="color:var(--gold);font-style:italic">SPIMUN</em></h2>
+  <p style="color:rgba(255,255,255,.5);font-size:1.05rem;margin-bottom:3rem">Keep up with updates, behind the scenes and conference news.</p>
+  <div style="display:flex;gap:1.5rem;justify-content:center;flex-wrap:wrap">
+    <a href="https://www.instagram.com/spimun.conference/" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:.9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:1.2rem 2rem;text-decoration:none;transition:all .25s;min-width:220px"
+       onmouseover="this.style.background='rgba(201,162,39,.15)';this.style.borderColor='var(--gold)'"
+       onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(255,255,255,.12)'">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#E1306C" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="#E1306C" stroke="none"/></svg>
+      <div style="text-align:left">
+        <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.2rem">Instagram</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--white)">@spimun.conference</div>
+      </div>
+    </a>
+    <a href="https://www.tiktok.com/@spimun.conference" target="_blank" rel="noopener"
+       style="display:flex;align-items:center;gap:.9rem;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:1.2rem 2rem;text-decoration:none;transition:all .25s;min-width:220px"
+       onmouseover="this.style.background='rgba(201,162,39,.15)';this.style.borderColor='var(--gold)'"
+       onmouseout="this.style.background='rgba(255,255,255,.06)';this.style.borderColor='rgba(255,255,255,.12)'">
+      <svg width="32" height="32" viewBox="0 0 24 24" fill="#ffffff" xmlns="http://www.w3.org/2000/svg"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1V9.01a6.33 6.33 0 00-.79-.05 6.34 6.34 0 00-6.34 6.34 6.34 6.34 0 006.34 6.34 6.34 6.34 0 006.33-6.34V8.95a8.19 8.19 0 004.79 1.53V7.03a4.85 4.85 0 01-1.02-.34z"/></svg>
+      <div style="text-align:left">
+        <div style="font-size:.72rem;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:.2rem">TikTok</div>
+        <div style="font-family:'Playfair Display',serif;font-size:1.15rem;font-weight:700;color:var(--white)">@spimun.conference</div>
+      </div>
+    </a>
+  </div>
+</section>
+<!-- SCHEDULE -->
+<section id="schedule">
+  <div class="container">
+    <p class="section-label">Programme</p>
+    <h2 class="section-title">Conference Schedule</h2>
+    <div class="divider"></div>
+    <div class="schedule-tabs">
+      <button class="tab-btn active" onclick="showDay('day1',this)">Day 1 — March 20</button>
+      <button class="tab-btn" onclick="showDay('day2',this)">Day 2 — March 21</button>
+    </div>
+    <div id="day1" class="day-panel active">
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">08:30 – 09:00</div><div class="tl-title">Arrival of Delegates</div><div class="tl-desc">Registration and welcome</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">09:15 – 09:45</div><div class="tl-title">Opening Ceremony</div><div class="tl-desc">Auditorium — address by the Secretary-General and guest speakers</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">09:45 – 10:00</div><div class="tl-title">Break</div><div class="tl-desc"></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">10:00 – 10:30</div><div class="tl-title">Lobbying</div><div class="tl-desc">Delegates meet and discuss positions before formal sessions</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">10:30 – 12:45</div><div class="tl-title">Committee Session I</div><div class="tl-desc">First formal debate session — roll call and opening speeches</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">12:45 – 13:00</div><div class="tl-title">Break</div><div class="tl-desc"></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">13:00 – 14:15</div><div class="tl-title">Committee Session II</div><div class="tl-desc">Moderated caucus — speakers list and formal debate continues</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">14:15 – 15:30</div><div class="tl-title">Lunch Break</div><div class="tl-desc">Cafeteria — networking encouraged</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">15:30 – 17:00</div><div class="tl-title">Committee Session III</div><div class="tl-desc">Unmoderated caucus — working paper drafting and bloc formation</div></div>
+      </div>
+    </div>
+    <div id="day2" class="day-panel">
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">09:00 – 09:30</div><div class="tl-title">Arrival of Delegates</div><div class="tl-desc">Second day registration and welcome back</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">09:30 – 11:00</div><div class="tl-title">Committee Session IV</div><div class="tl-desc">Working papers presented and debated</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">11:00 – 11:30</div><div class="tl-title">Break</div><div class="tl-desc"></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">11:30 – 13:00</div><div class="tl-title">Committee Session V</div><div class="tl-desc">Amendments, mergers and final debate on draft resolutions</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">13:00 – 14:30</div><div class="tl-title">Lunch Break</div><div class="tl-desc">Cafeteria</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">14:30 – 16:30</div><div class="tl-title">Committee Session VI</div><div class="tl-desc">Final voting procedure — all resolutions passed or failed</div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">16:30 – 16:50</div><div class="tl-title">Break</div><div class="tl-desc"></div></div>
+        <div class="tl-item"><div class="tl-dot"></div><div class="tl-time">16:50 – 17:30</div><div class="tl-title">Closing Ceremony</div><div class="tl-desc">Awards — Best Delegate, Outstanding Delegate, Best Position Paper</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- COMMITTEES -->
+<section id="committees">
+  <div class="container">
+    <p class="section-label">Committees</p>
+    <h2 class="section-title">Three Arenas of Debate</h2>
+    <div class="divider"></div>
+    <div class="committees-grid">
+      <div class="committee-card">
+        <div class="tag">Committee I</div>
+        <h3>General Assembly</h3>
+        <h4>Issue A</h4>
+        <p>Reassessing the United Nations' Mechanisms for Ensuring Accountability for War Crimes.</p>
+        <h4>Issue B</h4>
+        <p>Addressing the effects of national and international drug trafficking on Sustainable Development Goals 8 and 10.</p>
+        <div class="committee-downloads">
+          <a class="dl-btn" href="photos/GA_ISSUE1.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 1</a>
+          <a class="dl-btn" href="photos/GA_ISSUE2.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 2</a>
+        </div>
+        <h4>Clauses</h4>
+<p>Submited Clauses(google doc)</p>
+<a class="dl-btn" href="https://docs.google.com/document/d/1z0e3MqLEPNjiQmbj9xwPAJGacS7lFbreswZgoTTAvdo/edit?usp=sharing" target="_blank" rel="noopener">
+  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 01-2 2H5a2 2 0 01-2-2V8a2 2 0 012-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+  Submited GA Clauses
+</a>
+        <button class="chairs-toggle-btn" onclick="toggleChairs(this)"><span>Meet the Chairs</span><span class="chairs-arrow">▾</span></button>
+        <div class="chairs-panel">
+          <div class="chairs-grid">
+            <div class="chair-card"><div class="chair-photo"><img src="photos/helena.jpeg" alt="Helena Lachman" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Helena Lachman</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/marie.jpeg" alt="Marie Schnieder" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Marie Schnieder</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/karolina.jpeg" alt="Karolina Bialek" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Karolina Bialek</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="committee-card">
+        <div class="tag">Committee II</div>
+        <h3>Economic &amp; Social Council</h3>
+        <h4>Issue A</h4>
+        <p>Addressing the Economic and Social Impacts of Brexit on the United Kingdom, the European Union, and the International Community.</p>
+        <h4>Issue B</h4>
+        <p>Addressing Structural Barriers to Gender Equality in Political Representation and Decision-Making.</p>
+        <div class="committee-downloads">
+          <a class="dl-btn" href="photos/ECOSOC_ISSUE1.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 1</a>
+          <a class="dl-btn" href="photos/ECOSOC_ISSUE2.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 2</a>
+        </div>
+        <h4>Clauses</h4>
+<p>Submited Clauses(google doc).</p>
+<a class="dl-btn" href="https://docs.google.com/document/d/1GQ37AyyU5Vie7xLMIaG8mVLQyMz1Y3bOzP296MFhmfM/edit?usp=sharing" target="_blank" rel="noopener">
+  <svg viewBox="0 0 48 48" width="13" height="13" xmlns="http://www.w3.org/2000/svg"><path fill="#2196F3" d="M37 45H11c-1.7 0-3-1.3-3-3V6c0-1.7 1.3-3 3-3h19l10 10v29c0 1.7-1.3 3-3 3z"/><path fill="#BBDEFB" d="M40 13H30V3z"/><path fill="#E3F2FD" d="M15 23h18v2H15zm0 4h18v2H15zm0 4h14v2H15z"/></svg>
+  Submited ECOSOC Clauses
+</a>
+        <button class="chairs-toggle-btn" onclick="toggleChairs(this)"><span>Meet the Chairs</span><span class="chairs-arrow">▾</span></button>
+        <div class="chairs-panel">
+          <div class="chairs-grid">
+            <div class="chair-card"><div class="chair-photo"><img src="photos/ruyi.jpeg" alt="Ruyi Ye" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Ruyi Ye</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/pierre.jpeg" alt="Pierre Loret" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Pierre Loret</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/dana.jpeg" alt="Dana Al-Abed" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Dana Al-Abed</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/katie.jpeg" alt="Katie Tsiapriz-Lue" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Katie Tsiapriz-Lue</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="committee-card">
+        <div class="tag">Committee III</div>
+        <h3>Security Council</h3>
+        <h4>Issue A</h4>
+        <p>Preventing the Weaponization of Outer Space.</p>
+        <h4>Issue B</h4>
+        <p>The issue of the potential deployment of United Nations peacekeeping or observer forces in Gaza.</p>
+        <div class="committee-downloads">
+          <a class="dl-btn" href="photos/SC_ISSUE1.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 1</a>
+          <a class="dl-btn" href="photos/SC_ISSUE2.pdf" download><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>Issue 2</a>
+        </div>
+        <h4>Clauses</h4>
+<h4>Clauses</h4>
+<p>Submited Clauses(google doc).</p>
+<a class="dl-btn" href="https://docs.google.com/document/d/1fer3zBXN6ozIGLzKn3Lf96LVAGS-R47vRe7SzlPP4rY/edit?usp=sharing" target="_blank" rel="noopener">
+  <svg viewBox="0 0 48 48" width="13" height="13" xmlns="http://www.w3.org/2000/svg"><path fill="#2196F3" d="M37 45H11c-1.7 0-3-1.3-3-3V6c0-1.7 1.3-3 3-3h19l10 10v29c0 1.7-1.3 3-3 3z"/><path fill="#BBDEFB" d="M40 13H30V3z"/><path fill="#E3F2FD" d="M15 23h18v2H15zm0 4h18v2H15zm0 4h14v2H15z"/></svg>
+  Submited SC Clauses
+</a>
+        <button class="chairs-toggle-btn" onclick="toggleChairs(this)"><span>Meet the Chairs</span><span class="chairs-arrow">▾</span></button>
+        <div class="chairs-panel">
+          <div class="chairs-grid">
+            <div class="chair-card"><div class="chair-photo"><img src="photos/gui.jpeg" alt="Guilherme Braga" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Guilherme Braga</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/julia.jpeg" alt="Maria Julia" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Maria Julia</div></div>
+            <div class="chair-card"><div class="chair-photo"><img src="photos/murta.jpeg" alt="Lilian Murta" onerror="this.parentNode.innerHTML='👤'"></div><div class="chair-name">Lilian Murta</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ARTICLES PREVIEW -->
+<section id="articles-preview">
+  <div class="container">
+    <p class="section-label">SPIMUN Press</p>
+    <h2 class="section-title">Latest Articles</h2>
+    <div class="divider"></div>
+    <div class="articles-preview-grid" id="articlesPreviewGrid">
+      <p class="ap-empty">Loading…</p>
+    </div>
+    <a href="articles.html" class="view-all-btn">View All Articles →</a>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="container">
+    <p class="section-label">Gallery</p>
+    <h2 class="section-title">Moments from Past Editions</h2>
+    <div class="divider"></div>
+    <div class="gallery-grid" id="galleryGrid">
+      <div class="gallery-item" onclick="openLightbox(0)"><div class="gallery-placeholder"><img src="photos/pic1.jpeg" alt=""></div></div>
+      <div class="gallery-item" onclick="openLightbox(1)"><div class="gallery-placeholder"><img src="photos/pic2.jpeg" alt=""></div></div>
+      <div class="gallery-item" onclick="openLightbox(2)"><div class="gallery-placeholder"><img src="photos/pic3.jpeg" alt=""></div></div>
+      <div class="gallery-item" onclick="openLightbox(3)"><div class="gallery-placeholder"><img src="photos/pic5.jpeg" alt=""></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(4)"><div class="gallery-placeholder"><img src="photos/pic16.png" alt="" onerror="this.parentNode.innerHTML='📜'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(5)"><div class="gallery-placeholder"><img src="photos/pic7.png" alt="" onerror="this.parentNode.innerHTML='🏆'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(6)"><div class="gallery-placeholder"><img src="photos/pic9.png" alt="" onerror="this.parentNode.innerHTML='🌍'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(7)"><div class="gallery-placeholder"><img src="photos/pic10.png" alt="" onerror="this.parentNode.innerHTML='✍️'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(8)"><div class="gallery-placeholder"><img src="photos/pic11.png" alt="" onerror="this.parentNode.innerHTML='🕊️'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(9)"><div class="gallery-placeholder"><img src="photos/pic12.png" alt="" onerror="this.parentNode.innerHTML='🎭'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(10)"><div class="gallery-placeholder"><img src="photos/pic13.png" alt="" onerror="this.parentNode.innerHTML='🗳️'"></div></div>
+      <div class="gallery-item gallery-hidden" onclick="openLightbox(11)"><div class="gallery-placeholder"><img src="photos/pic14.png" alt="" onerror="this.parentNode.innerHTML='🎓'"></div></div>
+    </div>
+    <button class="gallery-toggle-btn" id="galleryToggle" onclick="toggleGallery()">Show All Photos ↓</button>
+  </div>
+</section>
+
+<!-- LIGHTBOX -->
+<div class="lightbox" id="lightbox" onclick="closeLightboxOutside(event)">
+  <div class="lightbox-inner">
+    <button class="lightbox-close" onclick="closeLightbox()">✕</button>
+    <button class="lightbox-nav lightbox-prev" onclick="shiftLightbox(-1)">‹</button>
+    <div class="lightbox-content" id="lightboxContent"></div>
+    <button class="lightbox-nav lightbox-next" onclick="shiftLightbox(1)">›</button>
+    <div class="lightbox-counter" id="lightboxCounter"></div>
+  </div>
+</div>
+
+<!-- STAFF -->
+<section id="staff">
+  <div class="container">
+    <p class="section-label">Secretariat</p>
+    <h2 class="section-title">Meet the Team</h2>
+    <div class="divider"></div>
+    <div class="staff-grid">
+      <div class="staff-card"><div class="staff-photo"><img src="photos/monicapic.jpeg" alt="Mónica Mateus"></div><div class="staff-name">Mónica Mateus</div><div class="staff-role">Head of Conference</div></div>
+      <div class="staff-card"><div class="staff-photo"><img src="photos/mouro.jpeg" alt="Rodrigo Mora"></div><div class="staff-name">Rodrigo Mora</div><div class="staff-role">Vice Head of Conference</div></div>
+    </div>
+    <div id="staffExtra" style="display:none;">
+      <div class="staff-grid" style="margin-top:1.8rem;">
+        <div class="staff-card"><div class="staff-photo"><img src="photos/siena.jpeg" alt="Silena Zhou"></div><div class="staff-name">Silena Zhou</div><div class="staff-role">Head of Logistics</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/sophieb.jpeg" alt="Sophie Brooks"></div><div class="staff-name">Sophie Brooks</div><div class="staff-role">Vice Head of Logistics</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/mahdi.jpeg" alt="Mahdi Tembe"></div><div class="staff-name">Mahdi Tembe</div><div class="staff-role">Head of Fundraising</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/ang.jpeg" alt="Angela Cooper"></div><div class="staff-name">Angela Cooper</div><div class="staff-role">Vice Head of Fundraising</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/bia.jpeg" alt="Beatriz Almeida"></div><div class="staff-name">Beatriz Almeida</div><div class="staff-role">Head of Staff</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/sky.jpeg" alt="Skyler Shah"></div><div class="staff-name">Skyler Shah</div><div class="staff-role">Vice Head of Staff</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/lou.jpeg" alt="Lou Guilhard"></div><div class="staff-name">Lou Guilhard</div><div class="staff-role">Head of Marketing</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/sophies.jpeg" alt="Sophie Satink"></div><div class="staff-name">Sophie Satink</div><div class="staff-role">Vice Head of Marketing</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/scarlet.jpeg" alt="Scarlet Shepard"></div><div class="staff-name">Scarlet Shepard</div><div class="staff-role">Head of Press</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/jastina.jpeg" alt="Jacinta Barao"></div><div class="staff-name">Jacinta Barao</div><div class="staff-role">Vice Head of Press</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/ivan.jpeg" alt="Ivan Kruchinin"></div><div class="staff-name">Ivan Kruchinin</div><div class="staff-role">Head of IT</div></div>
+        <div class="staff-card"><div class="staff-photo"><img src="photos/erica.jpeg" alt="Erica Yang"></div><div class="staff-name">Erica Yang</div><div class="staff-role">Photography</div></div>
+      </div>
+    </div>
+    <button class="staff-toggle-btn" id="staffToggle" onclick="toggleStaff()">Meet the Full Team ↓</button>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="container">
+    <p class="section-label">FAQ</p>
+    <h2 class="section-title">Frequently Asked Questions</h2>
+    <div class="divider"></div>
+    <div class="faq-list" id="faqList">
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How old do I have to be to take part in SPIMUN?<span class="faq-icon">+</span></button><div class="faq-answer">SPIMUN will welcome middle and high school delegates, from grades 7 to 12, between 12 and 18 years old.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">How can delegates register?<span class="faq-icon">+</span></button><div class="faq-answer">All registrations must be done by the advisors of each participating school until the 10th of January, 2026. For that, advisors should fill out the Delegate Registration Form.</div></div>
+      <div class="faq-item"><button class="faq-question" onclick="toggleFaq(this)">Will the committees have double delegations?<span class="faq-icon">+</span></button><div class="faq-answer">At SPIMUN there will only be individual delegations, to allow delegates to raise their points more often.</div></div>
+      <div class="faq-item faq-hidden"><button class="faq-question" onclick="toggleFaq(this)">Are schools allowed to select the countries they wish to represent?<span class="faq-icon">+</span></button><div class="faq-answer">No. In order to ensure a fair distribution of country assignments, participating schools will not be allowed to choose their own countries.</div></div>
+      <div class="faq-item faq-hidden"><button class="faq-question" onclick="toggleFaq(this)">What must delegates have prepared before the start of the conference?<span class="faq-icon">+</span></button><div class="faq-answer">Delegates must arrive at the conference with their clauses ready to be submitted. The drafting of opening speeches is not mandatory, yet highly advised.</div></div>
+      <div class="faq-item faq-hidden"><button class="faq-question" onclick="toggleFaq(this)">Does SPIMUN provide preparation assistance to delegates?<span class="faq-icon">+</span></button><div class="faq-answer">Delegates are always welcome to contact the Secretariat:<br><br>Head of Conference: <a href="mailto:monica.mateus.4552@edu.stpeters.pt">monica.mateus.4552@edu.stpeters.pt</a><br>Vice Head: <a href="mailto:rodrigo.mora.1939@edu.stpeters.pt">rodrigo.mora.1939@edu.stpeters.pt</a></div></div>
+      <div class="faq-item faq-hidden"><button class="faq-question" onclick="toggleFaq(this)">Will there be awards?<span class="faq-icon">+</span></button><div class="faq-answer">Yes. All delegates will receive participation certificates and there will be awards for best delegation and honourable mentions.</div></div>
+    </div>
+    <button class="faq-toggle-btn" id="faqToggle" onclick="toggleFaqList()">Show All Questions ↓</button>
+  </div>
+</section>
+
+<!-- RULES OF PROCEDURE -->
+<section id="rules">
+  <div class="container">
+    <p class="section-label">Delegate Guide</p>
+    <h2 class="section-title">Rules of Procedure</h2>
+    <div class="divider"></div>
+    <div style="max-width:900px;">
+      <p style="font-size:1.05rem; line-height:1.8; color:#3a3528; margin-bottom:1.5rem;">
+        The Rules of Procedure outline how debate will be conducted during SPIMUN 2026.
+        All delegates should familiarize themselves with these rules before the conference.
+      </p>
+      <a class="dl-btn" href="photos/rules2026.pdf" download style="margin-bottom:1.5rem; display:inline-flex; font-size:.85rem; padding:.6rem 1.2rem;">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 15V3m0 12l-4-4m4 4l4-4M2 17v2a2 2 0 002 2h16a2 2 0 002-2v-2"/></svg>
+        Download Rules of Procedure PDF
+      </a>
+      <div style="width:100%; height:700px; border:2px solid var(--light); border-radius:6px; overflow:hidden;">
+        <iframe src="photos/rules2026.pdf" width="100%" height="100%" style="border:none;"></iframe>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section id="contact">
+  <div class="container">
+    <p class="section-label">Get In Touch</p>
+    <h2 class="section-title">Contact &amp; Registration</h2>
+    <div class="divider"></div>
+    <div class="contact-grid">
+      <div class="contact-info reveal">
+        <p>Questions about registration, committees, or logistics? Reach out to our Secretariat — we're happy to help delegates, faculty advisors, and schools interested in participating.</p>
+        <div class="contact-detail"><div class="icon">📧</div><div class="text"><strong>Email</strong>monica.mateus.4552@edu.stpeters.pt</div></div>
+        <div class="contact-detail"><div class="icon">📧</div><div class="text"><strong>Email</strong>rodrigo.mora.1939@edu.stpeters.pt</div></div>
+        <div class="contact-detail"><div class="icon">🎵</div><div class="text"><strong>TikTok</strong><a href="https://www.tiktok.com/@spimun.conference" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">@spimun.conference</a></div></div>
+        <div class="contact-detail"><div class="icon">📸</div><div class="text"><strong>Instagram</strong><a href="https://www.instagram.com/spimun.conference/" target="_blank" rel="noopener" style="color:var(--gold);text-decoration:none;">@spimun.conference</a></div></div>
+        <div class="contact-detail"><div class="icon">📍</div><div class="text"><strong>Venue</strong>St. Peter's International School, Palmela, Portugal</div></div>
+        <div class="contact-detail"><div class="icon">📅</div><div class="text"><strong>Conference Dates</strong>March 20–21, 2026</div></div>
+        <div class="contact-detail"><div class="icon">⏰</div><div class="text"><strong>Registration Deadline</strong>February 28, 2026</div></div>
+      </div>
+      <div class="reveal">
+        <form id="contactForm" action="https://api.web3forms.com/submit" method="POST">
+          <input type="hidden" name="access_key" value="YOUR_ACCESS_KEY_HERE">
+          <input type="hidden" name="subject" value="SPIMUN 2026 — New Contact Form Submission">
+          <input type="hidden" name="redirect" value="false">
+          <div class="contact-form">
+            <input type="text"  name="name"    placeholder="Your Name"           required>
+            <input type="email" name="email"   placeholder="Email Address"       required>
+            <input type="text"  name="school"  placeholder="School / Delegation">
+            <textarea           name="message" placeholder="Your message or registration query…" required></textarea>
+            <button type="submit" class="submit-btn" id="submitBtn">Send Message</button>
+          </div>
+        </form>
+        <div class="form-success" id="formSuccess">
+          <div class="check">✅</div>
+          <p><strong>Message sent!</strong><br>We'll get back to you shortly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <p><strong>SPIMUN 2026</strong> — St. Peter's International School Model United Nations &nbsp;|&nbsp; Hosted by students</p>
+  <p style="margin-top:.6rem;">
+    <a href="https://www.instagram.com/spimun.conference/" target="_blank" rel="noopener" style="color:rgba(255,255,255,.5);text-decoration:none;margin-right:1.2rem;" onmouseover="this.style.color='#c9a227'" onmouseout="this.style.color='rgba(255,255,255,.5)'">📸 @spimun.conference</a>
+    <a href="https://www.tiktok.com/@spimun.conference" target="_blank" rel="noopener" style="color:rgba(255,255,255,.5);text-decoration:none;" onmouseover="this.style.color='#c9a227'" onmouseout="this.style.color='rgba(255,255,255,.5)'">🎵 @spimun.conference</a>
+  </p>
+  <p style="margin-top:.5rem;">© 2026 SPIMUN. All rights reserved. &nbsp;🍓 Proudly hosted on a Raspberry Pi.</p>
+</footer>
+
+<!-- LOGIN MODAL -->
+<div class="login-modal" id="loginModal">
+  <div class="login-box">
+    <button class="login-close" onclick="closeLogin()">✕</button>
+    <h3>SPIMUN Portal</h3>
+    <p class="subtitle">Delegate &amp; Secretariat access</p>
+    <div class="login-tabs">
+      <button class="login-tab active" onclick="switchTab('login')">Log In</button>
+      <button class="login-tab" onclick="switchTab('register')">Create Account</button>
+    </div>
+    <div id="tabLogin" class="lf">
+      <input type="email" id="liEmail" placeholder="Email address" autocomplete="email">
+      <input type="password" id="liPw" placeholder="Password" autocomplete="current-password">
+      <div class="lf-msg" id="liMsg"></div>
+      <button class="lf-btn" id="liBtn" onclick="doLogin()">Log In →</button>
+    </div>
+    <div id="tabRegister" class="lf" style="display:none">
+      <input type="text"  id="rgName"   placeholder="Full name" autocomplete="name">
+      <input type="text"  id="rgSchool" placeholder="School name">
+      <input type="email" id="rgEmail"  placeholder="Email address" autocomplete="email">
+      <input type="password" id="rgPw"  placeholder="Password (min. 6 characters)" autocomplete="new-password">
+      <div class="lf-msg" id="rgMsg"></div>
+      <button class="lf-btn" id="rgBtn" onclick="doRegister()">Create Account →</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  /* ANNOUNCEMENT */
+  async function loadAnnouncement() {
+    try {
+      const r = await fetch("/api/admin/announcement");
+      const d = await r.json();
+      if (d.active && d.text) {
+        const bar = document.getElementById("announcementBar");
+        bar.textContent = d.text;
+        bar.classList.add("visible");
+        document.body.classList.add("has-announcement");
+      } else {
+        document.getElementById("announcementBar").classList.remove("visible");
+        document.body.classList.remove("has-announcement");
+      }
+    } catch(e) {}
+  }
+  loadAnnouncement();
+  setInterval(loadAnnouncement, 30000);
+
+  /* HAMBURGER */
+  function toggleMenu() {
+    document.getElementById("navLinks").classList.toggle("open");
+    document.getElementById("hamburger").classList.toggle("open");
+  }
+  function closeMenu() {
+    document.getElementById("navLinks").classList.remove("open");
+    document.getElementById("hamburger").classList.remove("open");
+  }
+
+  /* LOGIN BUTTON */
+  function handleLoginBtn() {
+    const token = localStorage.getItem("spimun_token");
+    if (token) { window.location.href = "portal.html"; }
+    else { openLogin(); }
+  }
+  (async function() {
+    const token = localStorage.getItem("spimun_token");
+    if (!token) return;
+    try {
+      const r = await fetch("/api/me", { headers: { Authorization: "Bearer "+token } });
+      const u = await r.json();
+      if (u.name) document.getElementById("loginNavBtn").classList.add("logged-in");
+    } catch(e) {}
+  })();
+
+  /* LOGIN MODAL */
+  function openLogin()  { document.getElementById("loginModal").classList.add("open"); }
+  function closeLogin() { document.getElementById("loginModal").classList.remove("open"); }
+  function switchTab(tab) {
+    document.querySelectorAll(".login-tab").forEach((t,i)=>t.classList.toggle("active",(i===0&&tab==="login")||(i===1&&tab==="register")));
+    document.getElementById("tabLogin").style.display    = tab==="login"    ? "flex" : "none";
+    document.getElementById("tabRegister").style.display = tab==="register" ? "flex" : "none";
+  }
+  function showLfMsg(id,text,type){const el=document.getElementById(id);el.textContent=text;el.className="lf-msg "+type;}
+  async function doLogin() {
+    const email=document.getElementById("liEmail").value.trim();
+    const pw=document.getElementById("liPw").value;
+    const btn=document.getElementById("liBtn");
+    if(!email||!pw){showLfMsg("liMsg","Please fill in all fields","err");return;}
+    btn.disabled=true;btn.textContent="Logging in…";
+    try{
+      const r=await fetch("/api/login",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({email,password:pw})});
+      const d=await r.json();
+      if(d.ok){localStorage.setItem("spimun_token",d.token);showLfMsg("liMsg","✓ Success! Redirecting…","ok");setTimeout(()=>window.location.href="portal.html",700);}
+      else{showLfMsg("liMsg",d.error||"Login failed","err");btn.disabled=false;btn.textContent="Log In →";}
+    }catch(e){showLfMsg("liMsg","Could not connect to server","err");btn.disabled=false;btn.textContent="Log In →";}
+  }
+  async function doRegister() {
+    const name=document.getElementById("rgName").value.trim();
+    const school=document.getElementById("rgSchool").value.trim();
+    const email=document.getElementById("rgEmail").value.trim();
+    const pw=document.getElementById("rgPw").value;
+    const btn=document.getElementById("rgBtn");
+    if(!name||!email||!pw){showLfMsg("rgMsg","Name, email and password are required","err");return;}
+    btn.disabled=true;btn.textContent="Creating account…";
+    try{
+      const r=await fetch("/api/register",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({name,school,email,password:pw})});
+      const d=await r.json();
+      if(d.ok){showLfMsg("rgMsg","✓ Account created! You can now log in.","ok");btn.disabled=false;btn.textContent="Create Account →";setTimeout(()=>switchTab("login"),1500);}
+      else{showLfMsg("rgMsg",d.error||"Registration failed","err");btn.disabled=false;btn.textContent="Create Account →";}
+    }catch(e){showLfMsg("rgMsg","Could not connect to server","err");btn.disabled=false;btn.textContent="Create Account →";}
+  }
+  document.getElementById("liPw").addEventListener("keydown",e=>{if(e.key==="Enter")doLogin();});
+  document.getElementById("rgPw").addEventListener("keydown",e=>{if(e.key==="Enter")doRegister();});
+
+  /* ARTICLES PREVIEW */
+  async function loadArticlesPreview() {
+    const grid = document.getElementById("articlesPreviewGrid");
+    try {
+      const r = await fetch("/api/articles");
+      const articles = await r.json();
+      if (!Array.isArray(articles) || !articles.length) {
+        grid.innerHTML = '<p class="ap-empty">No articles published yet — check back soon.</p>';
+        return;
+      }
+      grid.innerHTML = articles.slice(0,3).map(a=>`
+        <a class="ap-card" href="article.html?id=${a.id}">
+          <div class="ap-card-img">
+            ${a.image?`<img src="${a.image}" alt="${a.title}" onerror="this.parentNode.innerHTML='📰'">`:'📰'}
+          </div>
+          <div class="ap-card-body">
+            <div class="ap-card-meta">${fmtDate(a.date)} · ${a.author}</div>
+            <div class="ap-card-title">${a.title}</div>
+            <div class="ap-card-summary">${a.summary}</div>
+            <div class="ap-card-read">Read Article →</div>
+          </div>
+        </a>
+      `).join("");
+    } catch(e) {
+      grid.innerHTML = '<p class="ap-empty">Could not load articles.</p>';
+    }
+  }
+  function fmtDate(d){if(!d)return"";return new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"});}
+  loadArticlesPreview();
+
+  /* SITE FUNCTIONS */
+  function showDay(id,btn){document.querySelectorAll('.day-panel').forEach(p=>p.classList.remove('active'));document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));document.getElementById(id).classList.add('active');btn.classList.add('active');}
+  const observer=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('visible');observer.unobserve(e.target);}});},{threshold:0.12});
+  document.querySelectorAll('.reveal').forEach(el=>observer.observe(el));
+  document.getElementById('contactForm').addEventListener('submit',async function(e){
+    e.preventDefault();const btn=document.getElementById('submitBtn');btn.textContent='Sending…';btn.disabled=true;
+    try{const res=await fetch('https://api.web3forms.com/submit',{method:'POST',body:new FormData(this)});const data=await res.json();
+    if(data.success){document.getElementById('contactForm').style.display='none';document.getElementById('formSuccess').style.display='block';}
+    else{btn.textContent='Send Message';btn.disabled=false;alert('Something went wrong. Please email us directly.');}}
+    catch(err){btn.textContent='Send Message';btn.disabled=false;alert('Network error. Please email us directly.');}
+  });
+ let galleryItems=[];
+let galleryOpen=false;
+let lbIndex=0;
+
+async function loadGallery(){
+  try{
+    const r=await fetch("/api/gallery");
+    const photos=await r.json();
+    if(!Array.isArray(photos)||!photos.length) return;
+    galleryItems=photos;
+    const grid=document.getElementById("galleryGrid");
+    const visible=photos.slice(0,4);
+    const hidden=photos.slice(4);
+    grid.innerHTML=
+      visible.map((p,i)=>`<div class="gallery-item" onclick="openLightbox(${i})"><div class="gallery-placeholder"><img src="${p.url}" alt="" onerror="this.parentNode.innerHTML='📷'"></div></div>`).join("")+
+      hidden.map((p,i)=>`<div class="gallery-item gallery-hidden" onclick="openLightbox(${i+4})"><div class="gallery-placeholder"><img src="${p.url}" alt="" onerror="this.parentNode.innerHTML='📷'"></div></div>`).join("");
+  }catch(e){}
+}
+
+function toggleGallery(){
+  galleryOpen=!galleryOpen;
+  document.querySelectorAll('#galleryGrid .gallery-hidden').forEach(el=>el.classList.toggle('visible-card',galleryOpen));
+  document.getElementById('galleryToggle').textContent=galleryOpen?'Hide Photos ↑':'Show All Photos ↓';
+  if(!galleryOpen) document.getElementById('gallery').scrollIntoView({behavior:'smooth'});
+}
+
+function openLightbox(i){lbIndex=i;renderLightbox();document.getElementById('lightbox').classList.add('open');document.body.style.overflow='hidden';}
+
+function renderLightbox(){
+  const box=document.getElementById('lightboxContent');
+  const p=galleryItems[lbIndex];
+  if(!p){return;}
+  box.innerHTML=`<img src="${p.url}" style="max-width:88vw;max-height:84vh;object-fit:contain;display:block;border-radius:4px" onerror="this.parentNode.innerHTML='📷'">`;
+  document.getElementById('lightboxCounter').textContent=(lbIndex+1)+' / '+galleryItems.length;
+}
+
+function closeLightbox(){document.getElementById('lightbox').classList.remove('open');document.body.style.overflow='';}
+function closeLightboxOutside(e){if(e.target===document.getElementById('lightbox'))closeLightbox();}
+function shiftLightbox(dir){const n=galleryItems.length;lbIndex=(lbIndex+dir+n)%n;renderLightbox();}
+document.addEventListener('keydown',e=>{if(!document.getElementById('lightbox').classList.contains('open'))return;if(e.key==='ArrowRight')shiftLightbox(1);if(e.key==='ArrowLeft')shiftLightbox(-1);if(e.key==='Escape')closeLightbox();});
+
+loadGallery();
+  let staffOpen=false;
+  function toggleStaff(){staffOpen=!staffOpen;document.getElementById('staffExtra').style.display=staffOpen?'block':'none';document.getElementById('staffToggle').textContent=staffOpen?'Hide Team ↑':'Meet the Full Team ↓';if(!staffOpen)document.getElementById('staff').scrollIntoView({behavior:'smooth'});}
+  function toggleFaq(btn){const answer=btn.nextElementSibling;const isOpen=answer.classList.contains('open');document.querySelectorAll('.faq-answer').forEach(a=>a.classList.remove('open'));document.querySelectorAll('.faq-question').forEach(b=>b.classList.remove('open'));if(!isOpen){answer.classList.add('open');btn.classList.add('open');}}
+  let faqOpen=false;
+  function toggleFaqList(){faqOpen=!faqOpen;document.querySelectorAll('#faqList .faq-hidden').forEach(el=>el.classList.toggle('visible-card',faqOpen));document.getElementById('faqToggle').textContent=faqOpen?'Hide Questions ↑':'Show All Questions ↓';if(!faqOpen)document.getElementById('faq').scrollIntoView({behavior:'smooth'});}
+  function toggleChairs(btn){const panel=btn.nextElementSibling;const isOpen=panel.classList.contains('open');panel.classList.toggle('open',!isOpen);btn.classList.toggle('open',!isOpen);btn.querySelector('span:first-child').textContent=isOpen?'Meet the Chairs':'Hide Chairs';}
+</script>
+sudo tee /var/www/html/sitemap.xml << 'EOF'
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url><loc>https://spimunconference.org/</loc></url>
+  <url><loc>https://spimunconference.org/articles.html</loc></url>
+  <url><loc>https://spimunconference.org/portal.html</loc></url>
+</urlset>
+EOF
+</body>
+</html>

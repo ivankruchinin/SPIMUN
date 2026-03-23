@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>SPIMUN 2026 — Article</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900&family=Source+Sans+3:wght@300;400;600&display=swap" rel="stylesheet"/>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    :root{--navy:#0b1d3a;--gold:#c9a227;--cream:#f5f0e8;--white:#ffffff;--light:#e8e2d4;--ink:#1a1a2e;--muted:#7a7060}
+    body{font-family:'Source Sans 3',sans-serif;background:var(--cream);color:var(--ink)}
+
+    nav{position:fixed;top:0;left:0;width:100%;z-index:200;background:rgba(11,29,58,.97);backdrop-filter:blur(6px);border-bottom:2px solid var(--gold);display:flex;align-items:center;justify-content:space-between;padding:0 2rem;height:58px}
+    .nav-logo{font-family:'Playfair Display',serif;font-weight:900;font-size:1.1rem;color:var(--gold);text-decoration:none;display:flex;align-items:center;gap:.6rem}
+    .nav-logo img{height:36px;width:36px;object-fit:contain}
+    .nav-right{display:flex;align-items:center;gap:1.2rem}
+    .nav-link{color:rgba(255,255,255,.6);text-decoration:none;font-size:.82rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;transition:color .2s}
+    .nav-link:hover{color:var(--gold)}
+
+    .article-wrap{max-width:780px;margin:0 auto;padding:90px 2rem 5rem}
+
+    .back-link{display:inline-flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);text-decoration:none;margin-bottom:1.5rem;transition:gap .2s}
+    .back-link:hover{gap:.7rem}
+
+    .article-meta{display:flex;align-items:center;gap:1rem;margin-bottom:.8rem;flex-wrap:wrap}
+    .article-date{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);font-weight:700}
+    .article-author{font-size:.82rem;color:var(--muted)}
+    .article-edited{font-size:.78rem;color:var(--muted);font-style:italic}
+
+    .article-title{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.8rem);font-weight:900;color:var(--navy);line-height:1.2;margin-bottom:.8rem}
+    .divider{width:56px;height:3px;background:var(--gold);margin:1.2rem 0 2rem}
+
+    /* COVER IMAGE */
+    .article-hero{width:100%;max-height:420px;object-fit:cover;border-radius:8px;margin-bottom:2rem;display:block}
+
+    /* TEXT BODY */
+    .article-body{font-size:1.05rem;line-height:1.9;color:#2c2c2c;margin-bottom:2.5rem}
+    .article-body p{margin-bottom:1.2rem}
+    .article-body h2{font-family:'Playfair Display',serif;font-size:1.5rem;color:var(--navy);margin:2rem 0 .8rem}
+    .article-body h3{font-family:'Playfair Display',serif;font-size:1.2rem;color:var(--navy);margin:1.5rem 0 .6rem}
+    .article-body strong{color:var(--navy)}
+    .article-body a{color:var(--gold)}
+    .article-body blockquote{border-left:3px solid var(--gold);padding:.8rem 1.2rem;margin:1.5rem 0;background:rgba(201,162,39,.06);font-style:italic;color:var(--muted);border-radius:0 4px 4px 0}
+    .article-body ul,.article-body ol{padding-left:1.4rem;margin-bottom:1.2rem}
+    .article-body li{margin-bottom:.4rem}
+
+    /* PDF PAGES AS IMAGES */
+    .article-pages{display:flex;flex-direction:column;gap:12px;margin-bottom:2.5rem}
+    .article-pages img{width:100%;display:block;border-radius:6px;box-shadow:0 2px 16px rgba(0,0,0,.1)}
+
+    /* LOADING */
+    .loading{text-align:center;padding:5rem 2rem;color:var(--muted)}
+    .spinner{width:36px;height:36px;border:3px solid rgba(201,162,39,.2);border-top-color:var(--gold);border-radius:50%;animation:spin .7s linear infinite;margin:0 auto 1rem}
+    @keyframes spin{to{transform:rotate(360deg)}}
+
+    footer{background:#060f1e;color:rgba(255,255,255,.4);text-align:center;padding:1.5rem 1rem;font-size:.82rem;border-top:1px solid rgba(201,162,39,.2);margin-top:4rem}
+    footer strong{color:var(--gold)}
+
+    @media(max-width:600px){.article-wrap{padding:80px 1.2rem 4rem}}
+  </style>
+</head>
+<body>
+
+<nav>
+  <a class="nav-logo" href="index.html">
+    <img src="photos/newlogo.png" alt="SPIMUN" onerror="this.style.display='none'">
+    SPIMUN '26
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="articles.html">← All Articles</a>
+    <a class="nav-link" href="index.html">Main Site</a>
+  </div>
+</nav>
+
+<div class="article-wrap" id="articleWrap">
+  <div class="loading">
+    <div class="spinner"></div>
+    <p>Loading article…</p>
+  </div>
+</div>
+
+<footer>
+  <p><strong>SPIMUN 2026</strong> — St. Peter's International School Model United Nations</p>
+</footer>
+
+<script>
+function formatDate(d){
+  if(!d) return "";
+  return new Date(d).toLocaleDateString("en-GB",{day:"numeric",month:"long",year:"numeric"});
+}
+
+function renderBody(text){
+  if(!text) return "";
+  return text
+    .replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;")
+    .replace(/\*\*(.+?)\*\*/g,"<strong>$1</strong>")
+    .replace(/\*(.+?)\*/g,"<em>$1</em>")
+    .replace(/^### (.+)$/gm,"<h3>$1</h3>")
+    .replace(/^## (.+)$/gm,"<h2>$1</h2>")
+    .replace(/^> (.+)$/gm,"<blockquote>$1</blockquote>")
+    .replace(/\n\n+/g,"</p><p>")
+    .replace(/^/,"<p>").replace(/$/,"</p>")
+    .replace(/<p><\/p>/g,"")
+    .replace(/<p>(<h[23]>)/g,"$1")
+    .replace(/(<\/h[23]>)<\/p>/g,"$1")
+    .replace(/<p>(<blockquote>)/g,"$1")
+    .replace(/(<\/blockquote>)<\/p>/g,"$1");
+}
+
+async function loadArticle(){
+  const wrap = document.getElementById("articleWrap");
+  const id = new URLSearchParams(window.location.search).get("id");
+
+  if(!id){
+    wrap.innerHTML=`<a class="back-link" href="articles.html">← All Articles</a><p style="color:var(--muted);margin-top:2rem">No article specified.</p>`;
+    return;
+  }
+
+  try{
+    const r = await fetch("/api/articles/"+id);
+    if(!r.ok) throw new Error("Not found");
+    const a = await r.json();
+    if(a.error) throw new Error(a.error);
+
+    document.title = a.title + " — SPIMUN 2026";
+
+    const hasPages  = a.pages && a.pages.length > 0;
+    const hasBody   = a.body && a.body.trim().length > 0;
+    const hasCover  = a.image && !hasPages; // only show cover if no PDF pages
+
+    wrap.innerHTML = `
+      <a class="back-link" href="articles.html">← All Articles</a>
+
+      <div class="article-meta">
+        <span class="article-date">${formatDate(a.date)}</span>
+        <span class="article-author">By ${a.author}</span>
+        ${a.edited ? `<span class="article-edited">Edited ${a.edited}</span>` : ""}
+      </div>
+
+      <h1 class="article-title">${a.title}</h1>
+      <div class="divider"></div>
+
+      ${hasCover ? `<img class="article-hero" src="${a.image}" alt="${a.title}">` : ""}
+
+      ${hasBody ? `<div class="article-body">${renderBody(a.body)}</div>` : ""}
+
+      ${hasPages ? `
+        <div class="article-pages">
+          ${a.pages.map(p=>`<img src="${p}" alt="" loading="lazy">`).join("")}
+        </div>` : ""}
+
+      ${!hasPages && !hasBody ? `<p style="color:var(--muted);font-style:italic">No content available.</p>` : ""}
+    `;
+
+  }catch(e){
+    wrap.innerHTML=`
+      <a class="back-link" href="articles.html">← All Articles</a>
+      <p style="color:var(--muted);margin-top:2rem">Article not found or has been removed.</p>`;
+  }
+}
+
+loadArticle();
+</script>
+</body>
+</html>
