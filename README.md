@@ -10,7 +10,7 @@ A full-stack conference website built and self-hosted on a **Raspberry Pi**, pub
 
 ## Features
 
-- Single-page website with smooth-scroll navigation
+- Multi-page website with smooth-scroll navigation
 - Hero section with background image and animated emblem
 - Conference schedule (Day 1 & Day 2 timelines)
 - 3 committee cards with issue descriptions, PDF downloads, and chairs toggle
