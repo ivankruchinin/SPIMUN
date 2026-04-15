@@ -1,4 +1,4 @@
-# SPIMUN 2026 — Conference Website
+# SPIMUN 2026 — MUN Conference Website
 
 > **St. Peter's International Model United Nations 2026**  
 > Hosted at St. Peter's International School, Palmela, Portugal — March 20–21, 2026  
